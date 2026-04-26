@@ -3,7 +3,7 @@
   <ThingDef ParentName="ResourceBase">
     <defName>NutrientPasteRaw</defName>
     <label>nutrient raw paste</label>
-    <description>Processed nutrient base for 3D food printers. Inedible in this form.</description>
+    <description>Recycled nutrient base for food 3D printers. It is inedible in this form due to the chemicals in its composition, which allow it to be stored for a long time and enable 3D printers to work with it without problems.</description>
     <graphicData>
       <texPath>Things/NutrientPasteRaw</texPath>
       <graphicClass>Graphic_Single</graphicClass>
@@ -67,6 +67,7 @@
         <requiredWorkType>Crafting</requiredWorkType>
         <supportedRecipes>
           <li>MakeNutrientPaste</li>
+          <li>MakeNutrientPasteTen</li>
         </supportedRecipes>
       </li>
       <li Class="CompProperties_Power">

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LanguageData>
   <NutrientPasteRaw.label>Сырая нутриентная паста</NutrientPasteRaw.label>
-  <NutrientPasteRaw.description>Переработанная нутриентная основа для пищевых 3D принтеров. Несъедобна в этом виде.</NutrientPasteRaw.description>
+  <NutrientPasteRaw.description>Переработанная нутриентная основа для пищевых 3D принтеров. Несъедобна в этом виде из за химикатов в составе, которые позволяют ей долго храниться и дают возможность 3Д принтерам без проблем работать с ней.</NutrientPasteRaw.description>
 </LanguageData>

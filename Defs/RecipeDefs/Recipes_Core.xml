@@ -2,7 +2,7 @@
 <Defs>
   <RecipeDef>
     <defName>MakeNutrientPaste</defName>
-    <label>make nutrient paste (1 piece)</label>
+    <label>Make nutrient paste (1 piece)</label>
     <description>Process raw food into nutrient paste for 3D printers.</description>
     <jobString>Processing nutrient paste.</jobString>
     <workAmount>1200</workAmount>
@@ -13,11 +13,32 @@
             <li>FoodRaw</li>
           </categories>
         </filter>
-        <count>0.25</count>
+        <count>0.7</count>
       </li>
     </ingredients>
     <products>
       <NutrientPasteRaw>1</NutrientPasteRaw>
+    </products>
+  </RecipeDef>
+
+  <RecipeDef>
+    <defName>MakeNutrientPasteTen</defName>
+    <label>Make nutrient paste (10 piece)</label>
+    <description>Process raw food into nutrient paste for 3D printers.</description>
+    <jobString>Processing nutrient paste.</jobString>
+    <workAmount>6000</workAmount>
+    <ingredients>
+      <li>
+        <filter>
+          <categories>
+            <li>FoodRaw</li>
+          </categories>
+        </filter>
+        <count>7</count>
+      </li>
+    </ingredients>
+    <products>
+      <NutrientPasteRaw>10</NutrientPasteRaw>
     </products>
   </RecipeDef>
 </Defs>
