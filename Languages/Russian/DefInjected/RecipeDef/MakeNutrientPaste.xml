@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LanguageData>
+  <MakeNutrientPaste.label>приготовить нутриентную пасту</MakeNutrientPaste.label>
+  <MakeNutrientPaste.description>Переработать сырую еду в нутриентную пасту для 3D принтеров.</MakeNutrientPaste.description>
+  <MakeNutrientPaste.jobString>Переработка нутриентной пасты.</MakeNutrientPaste.jobString>
+</LanguageData>

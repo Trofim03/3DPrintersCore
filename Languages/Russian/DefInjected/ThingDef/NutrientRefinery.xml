@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LanguageData>
+  <NutrientRefinery.label>Нутриентный переработчик</NutrientRefinery.label>
+  <NutrientRefinery.description>Перерабатывает сырую еду в нутриентную пасту для 3D принтеров. Загрузите ингредиенты и ждите.</NutrientRefinery.description>
+</LanguageData>
