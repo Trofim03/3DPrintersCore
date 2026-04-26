@@ -41,8 +41,8 @@
       <li>NutrientRefiningTech</li>
     </researchPrerequisites>
     
-    <soundInteract>Interact_Meal</soundInteract>
-    <soundDrop>Drop_Meal</soundDrop>
+    <soundInteract>Standard_Drop</soundInteract>
+    <soundDrop>Standard_Drop</soundDrop>
     
     <!-- FoodMeals убрана, так как уже наследуется от MealBase -->
     <thingCategories>

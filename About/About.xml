@@ -6,23 +6,23 @@
     <supportedVersions>
         <li>1.6</li>
     </supportedVersions>
-    <description><![CDATA[
-    <size=26><b>3D Printers Core</b></size>
+    <description>
+        3D PRINTERS CORE
 
-    <size=18><b>Русский</b></size>
+        [Русский]
+        Добавляет в игру базовые 3D-принтеры.
 
-    Добавляет в игру базовые 3D-принтеры.
+        - Середина игры: доступ открывается после исследования Электричества
+        - Сырьё: переработка любой сырой еды в нутриентную пасту
+        - Еда: печать готовых блюд из пасты (вкуснее и футуристичнее!)
+        - Необходим для дальнейших аддонов
 
-    • <b>Середина игры:</b> доступ открывается после исследования Electricity
-    • <b>Сырьё:</b> переработка любой сырой еды в нутриентную пасту
-    • <b>Еда:</b> печать готовых блюд из пасты (вкуснее и футуристичнее!)
+        [English]
+        Adds basic 3D printers to the game.
 
-    <size=18><b>English</b></size>
-
-    Adds basic 3D printers to the game.
-
-    • <b>Mid-game:</b> access after researching Electricity
-    • <b>Raw materials:</b> process any raw food into nutrient paste
-    • <b>Food:</b> print ready meals from paste (tastier and futuristic!)
-    ]]></description>
+        - Mid-game: access after researching Electricity
+        - Raw materials: process any raw food into nutrient paste
+        - Food: print ready meals from paste (tastier and futuristic!)
+        - Required for further addons
+    </description>
 </ModMetaData>
