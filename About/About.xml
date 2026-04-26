@@ -10,7 +10,8 @@
         3D PRINTERS CORE
 
         [Русский]
-        Добавляет в игру базовые 3D-принтеры.
+        Добавляет в игру базовые 3D-принтеры способные на автоматическое производство по принципу загрузил-подождал-забрал (как бочка для брожения)
+        не требуется колонист для работы (только для загрузки и переноски готового результата)
 
         - Середина игры: доступ открывается после исследования Электричества
         - Сырьё: переработка любой сырой еды в нутриентную пасту
@@ -18,7 +19,8 @@
         - Необходим для дальнейших аддонов
 
         [English]
-        Adds basic 3D printers to the game.
+        Adds basic 3D printers to the game capable of automatic production based on the load-wait-take-out principle (like a fermentation barrel) 
+        no colonist is required for operation (only for loading and carrying the finished result)
 
         - Mid-game: access after researching Electricity
         - Raw materials: process any raw food into nutrient paste
