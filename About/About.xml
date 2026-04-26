@@ -6,31 +6,23 @@
     <supportedVersions>
         <li>1.6</li>
     </supportedVersions>
-    <description>
-        Добавляет в игру основные 3Д принтеры.
+    <description><![CDATA[
+    <size=26><b>3D Printers Core</b></size>
 
-        Доступ к базовым принтерам открывается с серидины игры и в дальнейшем будет дополняться.
+    <size=18><b>Русский</b></size>
 
-        Этот мод содержит базовую технологию производства сырья и еды из принтеров (аналог питательной пасты, так же без разделения по содержимому, но чуть вкуснее и футуристичнее (это еда из 3Д принтера, разве не круто? :) ))
-    
-        =================================
+    Добавляет в игру базовые 3D-принтеры.
 
-        Adds basic 3D printers to the game. 
-        
-        Access to basic printers opens from the middle of the game and will be expanded in the future. 
-        
-        This mod contains the basic technology for producing raw materials and food from printers (analogous to nutritional paste, also without separation by content, but a little tastier and more futuristic (this is food from a 3D printer, isn’t it cool? :) ))
-    </description>
+    • <b>Середина игры:</b> доступ открывается после исследования Electricity
+    • <b>Сырьё:</b> переработка любой сырой еды в нутриентную пасту
+    • <b>Еда:</b> печать готовых блюд из пасты (вкуснее и футуристичнее!)
 
-  <modDependencies>
-        <li>
-            <packageId>brrainz.harmony</packageId>
-            <displayName>Harmony</displayName>
-            <steamWorkshopUrl>https://steamcommunity.com/workshop/filedetails/?id=2009463077</steamWorkshopUrl>
-        </li>
-    </modDependencies>
-    
-    <loadAfter>
-        <li>brrainz.harmony</li>
-    </loadAfter>
+    <size=18><b>English</b></size>
+
+    Adds basic 3D printers to the game.
+
+    • <b>Mid-game:</b> access after researching Electricity
+    • <b>Raw materials:</b> process any raw food into nutrient paste
+    • <b>Food:</b> print ready meals from paste (tastier and futuristic!)
+    ]]></description>
 </ModMetaData>
