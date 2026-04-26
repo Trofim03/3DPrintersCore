@@ -36,6 +36,10 @@
         <daysToRotStart>3</daysToRotStart>
       </li>
     </comps>
+
+    <researchPrerequisites>
+      <li>NutrientRefiningTech</li>
+    </researchPrerequisites>
     
     <soundInteract>Interact_Meal</soundInteract>
     <soundDrop>Drop_Meal</soundDrop>

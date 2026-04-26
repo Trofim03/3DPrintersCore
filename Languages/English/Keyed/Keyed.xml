@@ -22,4 +22,6 @@
   <_3DPrinters.ProcessingStatus>Processing: {0}%</_3DPrinters.ProcessingStatus>
   <_3DPrinters.Stopped>Stopped</_3DPrinters.Stopped>
   <_3DPrinters.RecipeLabel>Recipe: {0}</_3DPrinters.RecipeLabel>
+
+  <_3DPrinters.IngredientsReturned>Ingredients returned in front of the printer.</_3DPrinters.IngredientsReturned>
 </LanguageData>

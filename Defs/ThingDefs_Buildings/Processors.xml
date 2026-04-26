@@ -13,6 +13,9 @@
       <MarketValue>0.8</MarketValue>
     </statBases>
     <stackLimit>75</stackLimit>
+    <researchPrerequisites>
+      <li>NutrientRefiningTech</li>
+    </researchPrerequisites>
   </ThingDef>
 
   <ThingDef ParentName="BuildingBase">
