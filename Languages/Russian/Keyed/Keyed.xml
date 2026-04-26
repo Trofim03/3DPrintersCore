@@ -1,8 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LanguageData>
-  
-  <_3DPrinters.ProcessingStatus>Печать {0}, осталось {1} ч</_3DPrinters.ProcessingStatus>
-  <_3DPrinters.ProcessingGeneric>Обработка...</_3DPrinters.ProcessingGeneric>
-  <_3DPrinters.PrinterTip>Автоматически перерабатывает загруженные ингредиенты в готовую продукцию.</_3DPrinters.PrinterTip>
-  
+  <!-- Float Menu (ПКМ) -->
+  <_3DPrinters.SelectRecipeFloat>Выбрать рецепт: {0}</_3DPrinters.SelectRecipeFloat>
+  <_3DPrinters.ForceOperateFloat>Принудительно запустить принтер</_3DPrinters.ForceOperateFloat>
+  <_3DPrinters.StopFloat>Остановить принтер</_3DPrinters.StopFloat>
+  <_3DPrinters.ResumeFloat>Возобновить принтер</_3DPrinters.ResumeFloat>
+
+  <!-- Gizmo (кнопки управления) -->
+  <_3DPrinters.SelectRecipeGizmo>Выбрать рецепт</_3DPrinters.SelectRecipeGizmo>
+  <_3DPrinters.RecipeGizmo>Рецепт: {0}</_3DPrinters.RecipeGizmo>
+  <_3DPrinters.RecipeGizmoDesc>Нажмите, чтобы выбрать рецепт производства.</_3DPrinters.RecipeGizmoDesc>
+  <_3DPrinters.StopGizmo>Остановить</_3DPrinters.StopGizmo>
+  <_3DPrinters.StopGizmoDesc>Остановить производство. Колонисты не будут загружать ингредиенты.</_3DPrinters.StopGizmoDesc>
+  <_3DPrinters.ResumeGizmo>Возобновить</_3DPrinters.ResumeGizmo>
+  <_3DPrinters.ResumeGizmoDesc>Возобновить производство.</_3DPrinters.ResumeGizmoDesc>
+
+  <!-- Инспекция (статус) -->
+  <_3DPrinters.NoRecipeSelected>Рецепт не выбран</_3DPrinters.NoRecipeSelected>
+  <_3DPrinters.WaitingForIngredients>Ожидание ингредиентов</_3DPrinters.WaitingForIngredients>
+  <_3DPrinters.ProcessingStatus>Обработка: {0}%</_3DPrinters.ProcessingStatus>
+  <_3DPrinters.Stopped>Остановлено</_3DPrinters.Stopped>
+  <_3DPrinters.RecipeLabel>Рецепт: {0}</_3DPrinters.RecipeLabel>
 </LanguageData>

@@ -1,8 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LanguageData>
-  
-  <_3DPrinters.ProcessingStatus>Printing {0}, {1} hours left</_3DPrinters.ProcessingStatus>
-  <_3DPrinters.ProcessingGeneric>Processing...</_3DPrinters.ProcessingGeneric>
-  <_3DPrinters.PrinterTip>Automatically processes loaded ingredients into finished products.</_3DPrinters.PrinterTip>
-  
+  <!-- Float Menu (Right Click) -->
+  <_3DPrinters.SelectRecipeFloat>Select recipe: {0}</_3DPrinters.SelectRecipeFloat>
+  <_3DPrinters.ForceOperateFloat>Force operate printer</_3DPrinters.ForceOperateFloat>
+  <_3DPrinters.StopFloat>Stop printer</_3DPrinters.StopFloat>
+  <_3DPrinters.ResumeFloat>Resume printer</_3DPrinters.ResumeFloat>
+
+  <!-- Gizmo (Control Buttons) -->
+  <_3DPrinters.SelectRecipeGizmo>Select recipe</_3DPrinters.SelectRecipeGizmo>
+  <_3DPrinters.RecipeGizmo>Recipe: {0}</_3DPrinters.RecipeGizmo>
+  <_3DPrinters.RecipeGizmoDesc>Click to select production recipe.</_3DPrinters.RecipeGizmoDesc>
+  <_3DPrinters.StopGizmo>Stop</_3DPrinters.StopGizmo>
+  <_3DPrinters.StopGizmoDesc>Stop production. Colonists will not load ingredients.</_3DPrinters.StopGizmoDesc>
+  <_3DPrinters.ResumeGizmo>Resume</_3DPrinters.ResumeGizmo>
+  <_3DPrinters.ResumeGizmoDesc>Resume production.</_3DPrinters.ResumeGizmoDesc>
+
+  <!-- Inspection (Status) -->
+  <_3DPrinters.NoRecipeSelected>No recipe selected</_3DPrinters.NoRecipeSelected>
+  <_3DPrinters.WaitingForIngredients>Waiting for ingredients</_3DPrinters.WaitingForIngredients>
+  <_3DPrinters.ProcessingStatus>Processing: {0}%</_3DPrinters.ProcessingStatus>
+  <_3DPrinters.Stopped>Stopped</_3DPrinters.Stopped>
+  <_3DPrinters.RecipeLabel>Recipe: {0}</_3DPrinters.RecipeLabel>
 </LanguageData>

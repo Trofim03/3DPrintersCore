@@ -22,7 +22,6 @@ namespace _3DPrinters
 
         public override IEnumerable<Thing> PotentialWorkThingsGlobal(Pawn pawn)
         {
-            // Привязано к Research (исследование/умственный труд)
             if (pawn.workSettings == null || !pawn.workSettings.WorkIsActive(WorkTypeDefOf.Research))
                 yield break;
 
@@ -97,14 +96,14 @@ namespace _3DPrinters
                 foreach (var recipe in comp.Props.supportedRecipes)
                 {
                     var r = recipe;
-                    string label = "Select recipe: " + r.label;
+                    string label = "_3DPrinters.SelectRecipeFloat".Translate(r.label);
                     yield return new FloatMenuOption(label, () => comp.SelectRecipe(r));
                 }
             }
 
             if (comp.CurrentState == PrinterState.WaitingForIngredients && comp.SelectedRecipe != null)
             {
-                yield return new FloatMenuOption("Force operate printer", () =>
+                yield return new FloatMenuOption("_3DPrinters.ForceOperateFloat".Translate(), () =>
                 {
                     Job job = JobMaker.MakeJob(_3DPrintersJobDefOf.Operate3DPrinter, this);
                     selPawn.jobs.TryTakeOrderedJob(job, JobTag.Misc);
@@ -113,12 +112,12 @@ namespace _3DPrinters
 
             if (comp.CurrentState == PrinterState.Processing || comp.CurrentState == PrinterState.WaitingForIngredients)
             {
-                yield return new FloatMenuOption("Stop printer", () => comp.StopMachine());
+                yield return new FloatMenuOption("_3DPrinters.StopFloat".Translate(), () => comp.StopMachine());
             }
 
             if (comp.CurrentState == PrinterState.Stopped)
             {
-                yield return new FloatMenuOption("Resume printer", () => comp.ResumeMachine());
+                yield return new FloatMenuOption("_3DPrinters.ResumeFloat".Translate(), () => comp.ResumeMachine());
             }
         }
 
@@ -185,7 +184,6 @@ namespace _3DPrinters
             {
                 Thing thing = ThingMaker.MakeThing(product.thingDef);
                 thing.stackCount = product.count;
-                // Исправленный вызов - просто спавним предмет
                 GenSpawn.Spawn(thing, pos, map);
             }
             state = PrinterState.WaitingForIngredients;
@@ -303,7 +301,14 @@ namespace _3DPrinters
         {
             if (Props?.supportedRecipes == null || Props.supportedRecipes.Count == 0) yield break;
 
-            string currentLabel = selectedRecipe != null ? selectedRecipe.label : "Select recipe";
+            string currentLabel;
+            if (selectedRecipe != null)
+                currentLabel = selectedRecipe.label;
+            else
+            {
+                TaggedString selectLabel = "_3DPrinters.SelectRecipeGizmo".Translate();
+                currentLabel = selectLabel.ToString();
+            }
             var options = new List<FloatMenuOption>();
             foreach (var recipe in Props.supportedRecipes)
             {
@@ -313,8 +318,8 @@ namespace _3DPrinters
 
             yield return new Command_Action
             {
-                defaultLabel = "Recipe: " + currentLabel,
-                defaultDesc = "Click to select recipe",
+                defaultLabel = "_3DPrinters.RecipeGizmo".Translate(currentLabel),
+                defaultDesc = "_3DPrinters.RecipeGizmoDesc".Translate(),
                 icon = TexCommand.DesirePower,
                 action = () => Find.WindowStack.Add(new FloatMenu(options))
             };
@@ -322,16 +327,16 @@ namespace _3DPrinters
             if (state == PrinterState.Processing || state == PrinterState.WaitingForIngredients)
                 yield return new Command_Action
                 {
-                    defaultLabel = "Stop",
-                    defaultDesc = "Stop production",
+                    defaultLabel = "_3DPrinters.StopGizmo".Translate(),
+                    defaultDesc = "_3DPrinters.StopGizmoDesc".Translate(),
                     icon = TexCommand.ForbidOn,
                     action = () => StopMachine()
                 };
             else if (state == PrinterState.Stopped)
                 yield return new Command_Action
                 {
-                    defaultLabel = "Resume",
-                    defaultDesc = "Resume production",
+                    defaultLabel = "_3DPrinters.ResumeGizmo".Translate(),
+                    defaultDesc = "_3DPrinters.ResumeGizmoDesc".Translate(),
                     icon = TexCommand.ForbidOff,
                     action = () => ResumeMachine()
                 };
@@ -339,17 +344,31 @@ namespace _3DPrinters
 
         public string GetInspectStringExtra()
         {
-            if (selectedRecipe == null) return "No recipe selected";
+            if (selectedRecipe == null)
+            {
+                TaggedString noRecipe = "_3DPrinters.NoRecipeSelected".Translate();
+                return noRecipe.ToString();
+            }
 
             string status = "";
             switch (state)
             {
-                case PrinterState.WaitingForIngredients: status = "Waiting for ingredients"; break;
-                case PrinterState.Processing: status = "Processing: " + ((float)workDone / workNeeded * 100f).ToString("F0") + "%"; break;
-                case PrinterState.Stopped: status = "Stopped"; break;
+                case PrinterState.WaitingForIngredients:
+                    TaggedString waiting = "_3DPrinters.WaitingForIngredients".Translate();
+                    status = waiting.ToString();
+                    break;
+                case PrinterState.Processing:
+                    TaggedString processing = "_3DPrinters.ProcessingStatus".Translate(((float)workDone / workNeeded * 100f).ToString("F0"));
+                    status = processing.ToString();
+                    break;
+                case PrinterState.Stopped:
+                    TaggedString stopped = "_3DPrinters.Stopped".Translate();
+                    status = stopped.ToString();
+                    break;
             }
 
-            return status + "\nRecipe: " + selectedRecipe.label;
+            TaggedString recipeLabel = "_3DPrinters.RecipeLabel".Translate(selectedRecipe.label);
+            return status + "\n" + recipeLabel.ToString();
         }
 
         public override void PostExposeData()
