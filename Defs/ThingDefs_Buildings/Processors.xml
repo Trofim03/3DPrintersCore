@@ -1,71 +1,79 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Defs>
-  <!-- СЫРЬЁ -->
   <ThingDef ParentName="ResourceBase">
     <defName>NutrientPasteRaw</defName>
     <label>nutrient raw paste</label>
     <description>Processed nutrient base for 3D food printers. Inedible in this form.</description>
-    
     <graphicData>
       <texPath>Things/NutrientPasteRaw</texPath>
       <graphicClass>Graphic_Single</graphicClass>
     </graphicData>
-    
     <statBases>
       <Mass>0.5</Mass>
       <MarketValue>0.8</MarketValue>
     </statBases>
-    
     <stackLimit>75</stackLimit>
   </ThingDef>
 
-  <!-- СТАНОК -->
   <ThingDef ParentName="BuildingBase">
     <defName>NutrientRefinery</defName>
     <label>nutrient refinery</label>
     <description>Processes raw food into nutrient paste for 3D printers. Load ingredients and wait.</description>
-    
     <thingClass>_3DPrinters.Building_AutoProcessor</thingClass>
     <tickerType>Normal</tickerType>
-    
     <graphicData>
       <texPath>Buildings/Refinery</texPath>
       <graphicClass>Graphic_Multi</graphicClass>
       <drawSize>(2,2)</drawSize>
     </graphicData>
-
     <size>(2,2)</size>
-    
     <costList>
       <Steel>200</Steel>
       <ComponentIndustrial>5</ComponentIndustrial>
     </costList>
-
     <statBases>
       <Mass>10</Mass>
       <WorkToBuild>5000</WorkToBuild>
     </statBases>
-    
     <designationCategory>_3DPrinters</designationCategory>
-    
     <recipeMaker>
       <researchPrerequisite>NutrientRefiningTech</researchPrerequisite>
     </recipeMaker>
-    
+      <!-- 
+      Firefighter	Тушение пожаров
+      Patient	Пациент
+      Doctor	Врач
+      PatientBedRest	Постельный режим
+      Flicker	Переключение
+      Warden	Надзиратель
+      Handling	Животноводство
+      Cooking	Готовка
+      Hunting	Охота
+      Construction	Строительство
+      Growing	Растениеводство
+      Mining	Горное дело
+      PlantCutting	Вырубка растений
+      Smithing	Кузнечное дело
+      Tailoring	Портняжное дело
+      Art	Искусство
+      Crafting	Ремесло
+      Hauling	Переноска
+      Cleaning	Уборка
+      Research	Исследование
+      -->
     <comps>
       <li Class="_3DPrinters.CompProperties_AutoProcessor">
         <baseWorkAmount>4000</baseWorkAmount>
+        <requiredWorkType>Crafting</requiredWorkType>
         <supportedRecipes>
           <li>MakeNutrientPaste</li>
         </supportedRecipes>
       </li>
-      
       <li Class="CompProperties_Power">
         <compClass>CompPowerTrader</compClass>
         <basePowerConsumption>50</basePowerConsumption>
       </li>
     </comps>
-    
     <researchPrerequisites>
       <li>NutrientRefiningTech</li>
     </researchPrerequisites>

@@ -10,8 +10,9 @@
   <_3DPrinters.SelectRecipeGizmo>Select recipe</_3DPrinters.SelectRecipeGizmo>
   <_3DPrinters.RecipeGizmo>Recipe: {0}</_3DPrinters.RecipeGizmo>
   <_3DPrinters.RecipeGizmoDesc>Click to select production recipe.</_3DPrinters.RecipeGizmoDesc>
+  <_3DPrinters.NoWorkerDesc>No colonists assigned to "{0}". Printer will not be serviced automatically.</_3DPrinters.NoWorkerDesc>
   <_3DPrinters.StopGizmo>Stop</_3DPrinters.StopGizmo>
-  <_3DPrinters.StopGizmoDesc>Stop production. Colonists will not load ingredients.</_3DPrinters.StopGizmoDesc>
+  <_3DPrinters.StopGizmoDesc>Stop production.</_3DPrinters.StopGizmoDesc>
   <_3DPrinters.ResumeGizmo>Resume</_3DPrinters.ResumeGizmo>
   <_3DPrinters.ResumeGizmoDesc>Resume production.</_3DPrinters.ResumeGizmoDesc>
 

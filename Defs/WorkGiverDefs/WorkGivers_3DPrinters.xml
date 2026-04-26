@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+  <WorkGiverDef>
+    <defName>Operate3DPrinter</defName>
+    <giverClass>_3DPrinters.WorkGiver_Operate3DPrinter</giverClass>
+    <workType>Crafting</workType>
+    <priorityInType>50</priorityInType>
+    <verb>Operate</verb>
+    <gerund>Operating</gerund>
+    <requiredCapacities>
+      <li>Manipulation</li>
+    </requiredCapacities>
+    <directOrderable>true</directOrderable>
+  </WorkGiverDef>
+</Defs>

@@ -10,8 +10,9 @@
   <_3DPrinters.SelectRecipeGizmo>Выбрать рецепт</_3DPrinters.SelectRecipeGizmo>
   <_3DPrinters.RecipeGizmo>Рецепт: {0}</_3DPrinters.RecipeGizmo>
   <_3DPrinters.RecipeGizmoDesc>Нажмите, чтобы выбрать рецепт производства.</_3DPrinters.RecipeGizmoDesc>
+  <_3DPrinters.NoWorkerDesc>Нет колонистов, назначенных на работу "{0}". Принтер не будет обслуживаться автоматически.</_3DPrinters.NoWorkerDesc>
   <_3DPrinters.StopGizmo>Остановить</_3DPrinters.StopGizmo>
-  <_3DPrinters.StopGizmoDesc>Остановить производство. Колонисты не будут загружать ингредиенты.</_3DPrinters.StopGizmoDesc>
+  <_3DPrinters.StopGizmoDesc>Остановить производство.</_3DPrinters.StopGizmoDesc>
   <_3DPrinters.ResumeGizmo>Возобновить</_3DPrinters.ResumeGizmo>
   <_3DPrinters.ResumeGizmoDesc>Возобновить производство.</_3DPrinters.ResumeGizmoDesc>
 

@@ -13,22 +13,32 @@ namespace _3DPrinters
         public static JobDef Operate3DPrinter;
     }
 
+    // WorkGiver с привязкой к конкретному WorkType (Crafting)
     public class WorkGiver_Operate3DPrinter : WorkGiver_Scanner
     {
-        public override ThingRequest PotentialWorkThingRequest =>
+        public override ThingRequest PotentialWorkThingRequest => 
             ThingRequest.ForGroup(ThingRequestGroup.BuildingArtificial);
         public override PathEndMode PathEndMode => PathEndMode.Touch;
         public override bool Prioritized => true;
 
         public override IEnumerable<Thing> PotentialWorkThingsGlobal(Pawn pawn)
         {
-            if (pawn.workSettings == null || !pawn.workSettings.WorkIsActive(WorkTypeDefOf.Research))
+            if (pawn.workSettings == null)
                 yield break;
 
             foreach (var building in pawn.Map.listerBuildings.allBuildingsColonist)
             {
                 var comp = building.TryGetComp<CompAutoProcessor>();
-                if (comp != null && comp.NeedsWorkNow(pawn))
+                if (comp == null) continue;
+                
+                // Проверяем, что у колониста активен нужный тип работы
+                WorkTypeDef requiredWork = comp.Props.GetWorkTypeDef();
+                if (requiredWork == null) continue;
+                
+                if (!pawn.workSettings.WorkIsActive(requiredWork))
+                    continue;
+                
+                if (comp.NeedsWorkNow(pawn))
                     yield return building;
             }
         }
@@ -38,10 +48,16 @@ namespace _3DPrinters
             if (t.IsBurning()) return false;
             if (t.IsForbidden(pawn)) return false;
             if (!pawn.CanReserve(t, 1, -1, null, forced)) return false;
-
+            
             var comp = t.TryGetComp<CompAutoProcessor>();
             if (comp == null) return false;
-
+            
+            // Проверяем тип работы
+            WorkTypeDef requiredWork = comp.Props.GetWorkTypeDef();
+            if (requiredWork == null) return false;
+            if (pawn.workSettings != null && !pawn.workSettings.WorkIsActive(requiredWork) && !forced)
+                return false;
+            
             return comp.NeedsWorkNow(pawn);
         }
 
@@ -65,7 +81,7 @@ namespace _3DPrinters
             this.FailOnDespawnedOrNull(TargetIndex.A);
             this.FailOnBurningImmobile(TargetIndex.A);
             yield return Toils_Goto.GotoThing(TargetIndex.A, PathEndMode.Touch);
-
+            
             var workToil = new Toil
             {
                 initAction = () => Processor?.StartWorking(pawn),
@@ -91,19 +107,22 @@ namespace _3DPrinters
             var comp = GetComp<CompAutoProcessor>();
             if (comp == null) yield break;
 
-            if (comp.Props?.supportedRecipes != null && comp.Props.supportedRecipes.Count > 0)
+            if (comp.Props != null && comp.Props.supportedRecipes != null && comp.Props.supportedRecipes.Count > 0)
             {
                 foreach (var recipe in comp.Props.supportedRecipes)
                 {
                     var r = recipe;
-                    string label = "_3DPrinters.SelectRecipeFloat".Translate(r.label);
+                    TaggedString labelTag = "_3DPrinters.SelectRecipeFloat".Translate(r.label);
+                    string label = labelTag.ToString();
                     yield return new FloatMenuOption(label, () => comp.SelectRecipe(r));
                 }
             }
 
             if (comp.CurrentState == PrinterState.WaitingForIngredients && comp.SelectedRecipe != null)
             {
-                yield return new FloatMenuOption("_3DPrinters.ForceOperateFloat".Translate(), () =>
+                TaggedString forceTag = "_3DPrinters.ForceOperateFloat".Translate();
+                string forceLabel = forceTag.ToString();
+                yield return new FloatMenuOption(forceLabel, () =>
                 {
                     Job job = JobMaker.MakeJob(_3DPrintersJobDefOf.Operate3DPrinter, this);
                     selPawn.jobs.TryTakeOrderedJob(job, JobTag.Misc);
@@ -112,12 +131,16 @@ namespace _3DPrinters
 
             if (comp.CurrentState == PrinterState.Processing || comp.CurrentState == PrinterState.WaitingForIngredients)
             {
-                yield return new FloatMenuOption("_3DPrinters.StopFloat".Translate(), () => comp.StopMachine());
+                TaggedString stopTag = "_3DPrinters.StopFloat".Translate();
+                string stopLabel = stopTag.ToString();
+                yield return new FloatMenuOption(stopLabel, () => comp.StopMachine());
             }
 
             if (comp.CurrentState == PrinterState.Stopped)
             {
-                yield return new FloatMenuOption("_3DPrinters.ResumeFloat".Translate(), () => comp.ResumeMachine());
+                TaggedString resumeTag = "_3DPrinters.ResumeFloat".Translate();
+                string resumeLabel = resumeTag.ToString();
+                yield return new FloatMenuOption(resumeLabel, () => comp.ResumeMachine());
             }
         }
 
@@ -137,7 +160,12 @@ namespace _3DPrinters
             {
                 string extra = comp.GetInspectStringExtra();
                 if (!extra.NullOrEmpty())
-                    text = text.NullOrEmpty() ? extra : text + "\n" + extra;
+                {
+                    if (text.NullOrEmpty())
+                        text = extra;
+                    else
+                        text = text + "\n" + extra;
+                }
             }
             return text;
         }
@@ -162,11 +190,22 @@ namespace _3DPrinters
         public PrinterState CurrentState => state;
         public RecipeDef SelectedRecipe => selectedRecipe;
 
+        private Texture2D GetProductIcon()
+        {
+            if (selectedRecipe != null && selectedRecipe.products.Count > 0)
+            {
+                var product = selectedRecipe.products[0].thingDef;
+                if (product != null && product.uiIcon != null)
+                    return product.uiIcon;
+            }
+            return TexCommand.DesirePower;
+        }
+
         public override void CompTick()
         {
             base.CompTick();
             if (state != PrinterState.Processing) return;
-
+            
             var power = parent.GetComp<CompPowerTrader>();
             if (power != null && !power.PowerOn) return;
 
@@ -194,10 +233,10 @@ namespace _3DPrinters
         {
             if (state != PrinterState.WaitingForIngredients) return false;
             if (selectedRecipe == null) return false;
-
+            
             var power = parent.GetComp<CompPowerTrader>();
             if (power != null && !power.PowerOn) return false;
-
+            
             return HasEnoughIngredients(pawn);
         }
 
@@ -215,7 +254,7 @@ namespace _3DPrinters
                     if (checkedThings.Contains(thing)) continue;
                     if (thing.IsForbidden(pawn)) continue;
                     if (!pawn.CanReserve(thing)) continue;
-
+                    
                     foreach (var ing in selectedRecipe.ingredients)
                     {
                         if (ing.filter.Allows(thing.def))
@@ -255,14 +294,14 @@ namespace _3DPrinters
                 {
                     if (consumed >= needed) break;
                     if (thing.IsForbidden(pawn)) continue;
-
+                    
                     foreach (var ing in selectedRecipe.ingredients)
                     {
                         if (!ing.filter.Allows(thing.def)) continue;
                         float nutritionPerItem = thing.GetStatValue(StatDefOf.Nutrition);
                         float remaining = needed - consumed;
                         int itemsNeeded = Mathf.CeilToInt(remaining / nutritionPerItem);
-
+                        
                         if (itemsNeeded >= thing.stackCount)
                         {
                             consumed += nutritionPerItem * thing.stackCount;
@@ -294,52 +333,103 @@ namespace _3DPrinters
 
         public void ResumeMachine()
         {
-            state = selectedRecipe != null ? PrinterState.WaitingForIngredients : PrinterState.NoRecipe;
+            if (selectedRecipe != null)
+                state = PrinterState.WaitingForIngredients;
+            else
+                state = PrinterState.NoRecipe;
+        }
+
+        private bool HasWorkerAvailable()
+        {
+            WorkTypeDef requiredWork = Props.GetWorkTypeDef();
+            if (requiredWork == null) return false;
+            
+            var map = parent.Map;
+            if (map == null) return false;
+            
+            foreach (var pawn in map.mapPawns.FreeColonists)
+            {
+                if (pawn.workSettings != null && pawn.workSettings.WorkIsActive(requiredWork))
+                    return true;
+            }
+            return false;
         }
 
         public IEnumerable<Gizmo> GetGizmos()
         {
-            if (Props?.supportedRecipes == null || Props.supportedRecipes.Count == 0) yield break;
+            if (Props == null || Props.supportedRecipes == null || Props.supportedRecipes.Count == 0)
+                yield break;
+
+            bool hasWorker = HasWorkerAvailable();
+            WorkTypeDef requiredWork = Props.GetWorkTypeDef();
 
             string currentLabel;
             if (selectedRecipe != null)
                 currentLabel = selectedRecipe.label;
             else
             {
-                TaggedString selectLabel = "_3DPrinters.SelectRecipeGizmo".Translate();
-                currentLabel = selectLabel.ToString();
+                TaggedString selectTag = "_3DPrinters.SelectRecipeGizmo".Translate();
+                currentLabel = selectTag.ToString();
             }
+            
             var options = new List<FloatMenuOption>();
             foreach (var recipe in Props.supportedRecipes)
             {
                 var r = recipe;
-                options.Add(new FloatMenuOption(r.label, () => SelectRecipe(r), TexCommand.DesirePower, Color.white));
+                Texture2D icon = recipe.products.Count > 0 ? recipe.products[0].thingDef?.uiIcon : null;
+                if (icon == null) icon = TexCommand.DesirePower;
+                options.Add(new FloatMenuOption(r.label, () => SelectRecipe(r), icon, Color.white));
             }
-
+            
+            TaggedString recipeTag = "_3DPrinters.RecipeGizmo".Translate(currentLabel);
+            TaggedString recipeDescTag;
+            
+            if (!hasWorker && selectedRecipe != null)
+            {
+                string workTypeLabel = requiredWork != null ? requiredWork.label : "Unknown";
+                TaggedString noWorkerTag = "_3DPrinters.NoWorkerDesc".Translate(workTypeLabel);
+                recipeDescTag = noWorkerTag;
+            }
+            else
+            {
+                TaggedString normalDescTag = "_3DPrinters.RecipeGizmoDesc".Translate();
+                recipeDescTag = normalDescTag;
+            }
+            
+            Texture2D buttonIcon = GetProductIcon();
+            
             yield return new Command_Action
             {
-                defaultLabel = "_3DPrinters.RecipeGizmo".Translate(currentLabel),
-                defaultDesc = "_3DPrinters.RecipeGizmoDesc".Translate(),
-                icon = TexCommand.DesirePower,
+                defaultLabel = recipeTag.ToString(),
+                defaultDesc = recipeDescTag.ToString(),
+                icon = buttonIcon,
                 action = () => Find.WindowStack.Add(new FloatMenu(options))
             };
 
             if (state == PrinterState.Processing || state == PrinterState.WaitingForIngredients)
+            {
+                TaggedString stopTag = "_3DPrinters.StopGizmo".Translate();
+                TaggedString stopDescTag = "_3DPrinters.StopGizmoDesc".Translate();
                 yield return new Command_Action
                 {
-                    defaultLabel = "_3DPrinters.StopGizmo".Translate(),
-                    defaultDesc = "_3DPrinters.StopGizmoDesc".Translate(),
+                    defaultLabel = stopTag.ToString(),
+                    defaultDesc = stopDescTag.ToString(),
                     icon = TexCommand.ForbidOn,
                     action = () => StopMachine()
                 };
+            }
             else if (state == PrinterState.Stopped)
+            {
+                TaggedString resumeTag = "_3DPrinters.ResumeGizmo".Translate();
+                TaggedString resumeDescTag = "_3DPrinters.ResumeGizmoDesc".Translate();
                 yield return new Command_Action
                 {
-                    defaultLabel = "_3DPrinters.ResumeGizmo".Translate(),
-                    defaultDesc = "_3DPrinters.ResumeGizmoDesc".Translate(),
+                    defaultLabel = resumeTag.ToString(),
+                    defaultDesc = resumeDescTag.ToString(),
                     icon = TexCommand.ForbidOff,
                     action = () => ResumeMachine()
                 };
+            }
         }
 
         public string GetInspectStringExtra()
@@ -384,7 +474,14 @@ namespace _3DPrinters
     public class CompProperties_AutoProcessor : CompProperties
     {
         public int baseWorkAmount = 500;
+        public string requiredWorkType = "Crafting";
         public List<RecipeDef> supportedRecipes;
+        
         public CompProperties_AutoProcessor() => compClass = typeof(CompAutoProcessor);
+
+        public WorkTypeDef GetWorkTypeDef()
+        {
+            return DefDatabase<WorkTypeDef>.GetNamed(requiredWorkType, false);
+        }
     }
 }
