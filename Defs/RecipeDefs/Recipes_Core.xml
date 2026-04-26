@@ -1,35 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Defs>
   <RecipeDef>
-    <defName>RefineToNutrientPaste</defName>
-    <label>refine to nutrient paste</label>
-    <description>Process any raw food into nutrient paste for 3D printers.</description>
-    
-    <recipeUsers>
-      <li>NutrientRefinery</li>
-    </recipeUsers>
-    
-    <researchPrerequisite>NutrientRefiningTech</researchPrerequisite>
-    
-    <allowMixingIngredients>true</allowMixingIngredients>
-    <ingredientValueGetterClass>IngredientValueGetter_Nutrition</ingredientValueGetterClass>
-    
+    <defName>MakeNutrientPaste</defName>
+    <label>make nutrient paste</label>
+    <description>Process raw food into nutrient paste for 3D printers.</description>
+    <jobString>Processing nutrient paste.</jobString>
+    <workAmount>1200</workAmount>
     <ingredients>
       <li>
         <filter>
           <categories>
-            <li>RawMeat</li>
-            <li>PlantFoodRaw</li>
+            <li>FoodRaw</li>
           </categories>
         </filter>
-        <count>2.5</count>
+        <count>0.25</count>
       </li>
     </ingredients>
-    
     <products>
-        <NutrientPasteRaw>50</NutrientPasteRaw>
+      <NutrientPasteRaw>1</NutrientPasteRaw>
     </products>
-    
-    <workAmount>5000</workAmount>
   </RecipeDef>
 </Defs>

@@ -1,47 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Defs>
-  <!-- СТАНОК -->
-  <ThingDef ParentName="BuildingBase">
-    <defName>NutrientRefinery</defName>
-    <label>nutrient refinery</label>
-    <description>Processes raw food into nutrient paste for 3D printers. Load ingredients and wait.</description>
-    
-    <graphicData>
-      <texPath>Buildings/Refinery</texPath>
-      <graphicClass>Graphic_Multi</graphicClass>
-    </graphicData>
-    
-    <size>(2, 2)</size>
-    <costList>
-      <Steel>200</Steel>
-      <ComponentIndustrial>5</ComponentIndustrial>
-    </costList>
-    
-    <designationCategory>_3DPrinters</designationCategory>
-    
-    <recipeMaker>
-      <researchPrerequisite>NutrientRefiningTech</researchPrerequisite>
-    </recipeMaker>
-    
-    <comps>
-      <li Class="_3DPrinters.CompProperties_AutoProcessor">
-          <baseWorkAmount>1200</baseWorkAmount>
-          <requiredSkill>Crafting</requiredSkill>
-          <minSkillLevel>3</minSkillLevel>
-      </li>
-      
-      <!-- Компонент энергии -->
-      <li Class="CompProperties_Power">
-        <compClass>CompPowerTrader</compClass>
-        <basePowerConsumption>50</basePowerConsumption>
-      </li>
-    </comps>
-    
-    <researchPrerequisites>
-      <li>NutrientRefiningTech</li>
-    </researchPrerequisites>
-  </ThingDef>
-  
   <!-- СЫРЬЁ -->
   <ThingDef ParentName="ResourceBase">
     <defName>NutrientPasteRaw</defName>
@@ -59,5 +17,59 @@
     </statBases>
     
     <stackLimit>75</stackLimit>
+  </ThingDef>
+
+  <!-- СТАНОК -->
+  <ThingDef ParentName="BuildingBase">
+    <defName>NutrientRefinery</defName>
+    <label>nutrient refinery</label>
+    <description>Processes raw food into nutrient paste for 3D printers. Load ingredients and wait.</description>
+    
+    <thingClass>_3DPrinters.Building_AutoProcessor</thingClass>
+    <tickerType>Normal</tickerType>
+    
+    <graphicData>
+      <texPath>Buildings/Refinery</texPath>
+      <graphicClass>Graphic_Multi</graphicClass>
+      <drawSize>(2,2)</drawSize>
+    </graphicData>
+
+    <size>(2,2)</size>
+    
+    <costList>
+      <Steel>200</Steel>
+      <ComponentIndustrial>5</ComponentIndustrial>
+    </costList>
+
+    <statBases>
+      <Mass>10</Mass>
+      <WorkToBuild>2000</WorkToBuild>
+    </statBases>
+    
+    <designationCategory>_3DPrinters</designationCategory>
+    
+    <recipeMaker>
+      <researchPrerequisite>NutrientRefiningTech</researchPrerequisite>
+    </recipeMaker>
+    
+    <comps>
+      <li Class="_3DPrinters.CompProperties_AutoProcessor">
+        <baseWorkAmount>4000</baseWorkAmount>
+        <autoStartOnLoad>true</autoStartOnLoad>
+        <supportedRecipes>
+          <li>MakeNutrientPaste</li>
+        </supportedRecipes>
+      </li>
+      
+      <!-- Компонент энергии -->
+      <li Class="CompProperties_Power">
+        <compClass>CompPowerTrader</compClass>
+        <basePowerConsumption>50</basePowerConsumption>
+      </li>
+    </comps>
+    
+    <researchPrerequisites>
+      <li>NutrientRefiningTech</li>
+    </researchPrerequisites>
   </ThingDef>
 </Defs>

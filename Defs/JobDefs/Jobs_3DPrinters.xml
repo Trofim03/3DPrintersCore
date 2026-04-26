@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+  <JobDef>
+    <defName>Operate3DPrinter</defName>
+    <driverClass>_3DPrinters.JobDriver_Operate3DPrinter</driverClass>
+    <reportString>Operating 3D printer.</reportString>
+  </JobDef>
+</Defs>
