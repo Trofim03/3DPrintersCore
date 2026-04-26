@@ -1,0 +1,8 @@
+src/
+obj/
+.git/
+*.pdb
+*.csproj
+*.sln
+Thumbs.db
+.gitignore
