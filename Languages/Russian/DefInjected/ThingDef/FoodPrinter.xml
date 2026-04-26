@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LanguageData>
+  <FoodPrinter.label>Принтер еды</FoodPrinter.label>
+  <FoodPrinter.description>Принимает пищевое сырье и возвращает напечатанные блюда</FoodPrinter.description>
+</LanguageData>

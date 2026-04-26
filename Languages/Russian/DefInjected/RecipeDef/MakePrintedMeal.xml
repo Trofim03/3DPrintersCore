@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LanguageData>
-  <MakePrintedMeal.label>напечатать блюдо (1 шт.)</MakePrintedMeal.label>
+  <MakePrintedMeal.label>Напечатать блюдо (1 шт.)</MakePrintedMeal.label>
   <MakePrintedMeal.description>Процесс переработки сырья в синтезированную еду.</MakePrintedMeal.description>
   <MakePrintedMeal.jobString>Печать блюда.</MakePrintedMeal.jobString>
 </LanguageData>

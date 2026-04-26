@@ -1,28 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Defs>
-  <ThingDef ParentName="ResourceBase">
-    <defName>NutrientPasteRaw</defName>
-    <label>nutrient raw paste</label>
-    <description>Recycled nutrient base for food 3D printers. It is inedible in this form due to the chemicals in its composition, which allow it to be stored for a long time and enable 3D printers to work with it without problems.</description>
-    <graphicData>
-      <texPath>Things/NutrientPasteRaw</texPath>
-      <graphicClass>Graphic_Single</graphicClass>
-    </graphicData>
-    <statBases>
-      <Mass>0.5</Mass>
-      <MarketValue>0.8</MarketValue>
-    </statBases>
-    <stackLimit>75</stackLimit>
-  </ThingDef>
-
   <ThingDef ParentName="BuildingBase">
-    <defName>NutrientRefinery</defName>
-    <label>nutrient refinery</label>
-    <description>Processes raw food into nutrient paste for 3D printers. Load ingredients and wait.</description>
+    <defName>FoodPrinter</defName>
+    <label>Food printer</label>
+    <description>Receives food raw materials and returns printed dishes</description>
     <thingClass>_3DPrinters.Building_AutoProcessor</thingClass>
     <tickerType>Normal</tickerType>
     <graphicData>
-      <texPath>Buildings/Refinery/Refinery</texPath>
+      <texPath>Buildings/FoodPrinter/FoodPrinter</texPath>
       <graphicClass>Graphic_Multi</graphicClass>
       <drawSize>(2,2)</drawSize>
     </graphicData>
@@ -66,8 +51,8 @@
         <baseWorkAmount>4000</baseWorkAmount>
         <requiredWorkType>Cooking</requiredWorkType>
         <supportedRecipes>
-          <li>MakeNutrientPaste</li>
-          <li>MakeNutrientPasteTen</li>
+          <li>MakePrintedMeal</li>
+          <li>MakePrintedMealTen</li>
         </supportedRecipes>
       </li>
       <li Class="CompProperties_Power">
