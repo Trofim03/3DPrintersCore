@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+  <ResearchProjectDef>
+    <defName>NutrientRefiningTech</defName>
+    <label>nutrient refining</label>
+    <description>Allows construction of nutrient refineries to process raw food into 3D printer paste.</description>
+    
+    <!-- Стоимость в очках исследований -->
+    <baseCost>1500</baseCost>
+    
+    <!-- Технологический уровень (Industrial - стандартный для старта) -->
+    <techLevel>Industrial</techLevel>
+    
+    <!-- Предварительные исследования -->
+    <prerequisites>
+      <li>Electricity</li>
+    </prerequisites>
+
+    <tab>_3DPrintersTab</tab>
+    
+    <researchViewX>0</researchViewX>
+    <researchViewY>0</researchViewY>
+
+  </ResearchProjectDef>
+</Defs>

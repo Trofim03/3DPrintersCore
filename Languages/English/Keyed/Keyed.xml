@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LanguageData>
+  
+  <_3DPrinters.ProcessingStatus>Printing {0}, {1} hours left</_3DPrinters.ProcessingStatus>
+  <_3DPrinters.ProcessingGeneric>Processing...</_3DPrinters.ProcessingGeneric>
+  <_3DPrinters.PrinterTip>Automatically processes loaded ingredients into finished products.</_3DPrinters.PrinterTip>
+  
+</LanguageData>

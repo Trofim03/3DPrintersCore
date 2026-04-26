@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LanguageData>
+  
+  <NutrientRefinery.label>Нутриентный переработчик</NutrientRefinery.label>
+  <NutrientRefinery.description>Перерабатывает сырую пищу в нутриентную пасту для 3D-принтеров. В сыром виде не съедобна.</NutrientRefinery.description>
+  
+  <NutrientPasteRaw.label>Нутриентная паста (сырьё)</NutrientPasteRaw.label>
+  <NutrientPasteRaw.description>Переработанная нутриентная основа для пищевых 3D-принтеров. В этом виде не съедобна.</NutrientPasteRaw.description>
+  
+</LanguageData>

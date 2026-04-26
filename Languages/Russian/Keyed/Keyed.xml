@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LanguageData>
+  
+  <_3DPrinters.ProcessingStatus>Печать {0}, осталось {1} ч</_3DPrinters.ProcessingStatus>
+  <_3DPrinters.ProcessingGeneric>Обработка...</_3DPrinters.ProcessingGeneric>
+  <_3DPrinters.PrinterTip>Автоматически перерабатывает загруженные ингредиенты в готовую продукцию.</_3DPrinters.PrinterTip>
+  
+</LanguageData>

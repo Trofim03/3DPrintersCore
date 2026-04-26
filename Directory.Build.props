@@ -1,0 +1,6 @@
+<Project>
+  <PropertyGroup>
+    <RimWorldSteamFolder>S:\SteamLibrary\steamapps\workshop\content\294100</RimWorldSteamFolder>
+    <RimWorldPath>S:\SteamLibrary\steamapps\common\RimWorld</RimWorldPath>
+  </PropertyGroup>
+</Project>

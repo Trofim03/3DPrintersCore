@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+  <ResearchTabDef>
+    <defName>_3DPrintersTab</defName>
+    <label>3D Printers</label>
+    <generalTitle>Studying 3D technologies</generalTitle>
+    <generalDescription>Opens up the possibility of building 3D printers and their further use</generalDescription>
+  </ResearchTabDef>
+</Defs>
