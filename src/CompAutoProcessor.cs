@@ -7,31 +7,30 @@ using Verse.AI;
 
 namespace _3DPrinters
 {
-    // ==================== JobDefs ====================
     [DefOf]
     public static class _3DPrintersJobDefOf
     {
         public static JobDef Operate3DPrinter;
     }
 
-    // ==================== WorkGiver ====================
     public class WorkGiver_Operate3DPrinter : WorkGiver_Scanner
     {
-        public override ThingRequest PotentialWorkThingRequest => 
+        public override ThingRequest PotentialWorkThingRequest =>
             ThingRequest.ForGroup(ThingRequestGroup.BuildingArtificial);
-        
         public override PathEndMode PathEndMode => PathEndMode.Touch;
         public override bool Prioritized => true;
 
         public override IEnumerable<Thing> PotentialWorkThingsGlobal(Pawn pawn)
         {
+            // Привязано к Research (исследование/умственный труд)
+            if (pawn.workSettings == null || !pawn.workSettings.WorkIsActive(WorkTypeDefOf.Research))
+                yield break;
+
             foreach (var building in pawn.Map.listerBuildings.allBuildingsColonist)
             {
                 var comp = building.TryGetComp<CompAutoProcessor>();
-                if (comp != null && comp.ShouldBeWorkedOn(pawn))
-                {
+                if (comp != null && comp.NeedsWorkNow(pawn))
                     yield return building;
-                }
             }
         }
 
@@ -40,27 +39,22 @@ namespace _3DPrinters
             if (t.IsBurning()) return false;
             if (t.IsForbidden(pawn)) return false;
             if (!pawn.CanReserve(t, 1, -1, null, forced)) return false;
-            
+
             var comp = t.TryGetComp<CompAutoProcessor>();
             if (comp == null) return false;
-            
-            return comp.ShouldBeWorkedOn(pawn);
+
+            return comp.NeedsWorkNow(pawn);
         }
 
         public override Job JobOnThing(Pawn pawn, Thing t, bool forced = false)
         {
-            var comp = t.TryGetComp<CompAutoProcessor>();
-            if (comp == null) return null;
-            
-            return comp.GetJobFor(pawn, t);
+            return JobMaker.MakeJob(_3DPrintersJobDefOf.Operate3DPrinter, t);
         }
     }
 
-    // ==================== JobDriver ====================
     public class JobDriver_Operate3DPrinter : JobDriver
     {
-        private Building_AutoProcessor Printer => (Building_AutoProcessor)job.targetA.Thing;
-        private CompAutoProcessor Processor => Printer?.Processor;
+        private CompAutoProcessor Processor => job.targetA.Thing?.TryGetComp<CompAutoProcessor>();
 
         public override bool TryMakePreToilReservations(bool errorOnFailed)
         {
@@ -71,410 +65,291 @@ namespace _3DPrinters
         {
             this.FailOnDespawnedOrNull(TargetIndex.A);
             this.FailOnBurningImmobile(TargetIndex.A);
-
-            // Подойти к принтеру
             yield return Toils_Goto.GotoThing(TargetIndex.A, PathEndMode.Touch);
 
-            // Запустить принтер
-            var operateToil = new Toil
+            var workToil = new Toil
             {
-                initAction = () =>
-                {
-                    if (Processor != null)
-                    {
-                        Processor.TryStartMachine(pawn);
-                    }
-                },
+                initAction = () => Processor?.StartWorking(pawn),
                 defaultCompleteMode = ToilCompleteMode.Instant
             };
-            yield return operateToil;
+            yield return workToil;
         }
     }
 
-    // ==================== Building Class ====================
     public class Building_AutoProcessor : Building
     {
-        private CompAutoProcessor processorComp;
-
-        public CompAutoProcessor Processor
-        {
-            get
-            {
-                if (processorComp == null)
-                    processorComp = GetComp<CompAutoProcessor>();
-                return processorComp;
-            }
-        }
-
         public override void Tick()
         {
             base.Tick();
-            Processor?.CompTick();
+            GetComp<CompAutoProcessor>()?.CompTick();
+        }
+
+        public override IEnumerable<FloatMenuOption> GetFloatMenuOptions(Pawn selPawn)
+        {
+            foreach (var option in base.GetFloatMenuOptions(selPawn))
+                yield return option;
+
+            var comp = GetComp<CompAutoProcessor>();
+            if (comp == null) yield break;
+
+            if (comp.Props?.supportedRecipes != null && comp.Props.supportedRecipes.Count > 0)
+            {
+                foreach (var recipe in comp.Props.supportedRecipes)
+                {
+                    var r = recipe;
+                    string label = "Select recipe: " + r.label;
+                    yield return new FloatMenuOption(label, () => comp.SelectRecipe(r));
+                }
+            }
+
+            if (comp.CurrentState == PrinterState.WaitingForIngredients && comp.SelectedRecipe != null)
+            {
+                yield return new FloatMenuOption("Force operate printer", () =>
+                {
+                    Job job = JobMaker.MakeJob(_3DPrintersJobDefOf.Operate3DPrinter, this);
+                    selPawn.jobs.TryTakeOrderedJob(job, JobTag.Misc);
+                });
+            }
+
+            if (comp.CurrentState == PrinterState.Processing || comp.CurrentState == PrinterState.WaitingForIngredients)
+            {
+                yield return new FloatMenuOption("Stop printer", () => comp.StopMachine());
+            }
+
+            if (comp.CurrentState == PrinterState.Stopped)
+            {
+                yield return new FloatMenuOption("Resume printer", () => comp.ResumeMachine());
+            }
         }
 
         public override IEnumerable<Gizmo> GetGizmos()
         {
-            foreach (var gizmo in base.GetGizmos())
-            {
-                yield return gizmo;
-            }
-
-            if (Processor != null)
-            {
-                foreach (var gizmo in Processor.GetGizmos())
-                {
-                    yield return gizmo;
-                }
-            }
+            foreach (var g in base.GetGizmos()) yield return g;
+            var comp = GetComp<CompAutoProcessor>();
+            if (comp != null)
+                foreach (var g in comp.GetGizmos()) yield return g;
         }
 
         public override string GetInspectString()
         {
             string text = base.GetInspectString();
-            if (Processor != null)
+            var comp = GetComp<CompAutoProcessor>();
+            if (comp != null)
             {
-                string extra = Processor.CompInspectStringExtra();
+                string extra = comp.GetInspectStringExtra();
                 if (!extra.NullOrEmpty())
-                {
-                    if (!text.NullOrEmpty())
-                        text += "\n";
-                    text += extra;
-                }
+                    text = text.NullOrEmpty() ? extra : text + "\n" + extra;
             }
             return text;
         }
-
-        public override void ExposeData()
-        {
-            base.ExposeData();
-        }
     }
 
-    // ==================== Printer States ====================
     public enum PrinterState
     {
-        Idle,
         NoRecipe,
         WaitingForIngredients,
         Processing,
-        Paused,
         Stopped
     }
 
-    // ==================== CompAutoProcessor ====================
     public class CompAutoProcessor : ThingComp
     {
         public CompProperties_AutoProcessor Props => (CompProperties_AutoProcessor)props;
-
         private PrinterState state = PrinterState.NoRecipe;
         private RecipeDef selectedRecipe;
-        private int progress;
-        private int ticksToComplete;
-        private const int INGREDIENT_SEARCH_RADIUS = 8;
+        private int workDone;
+        private int workNeeded;
 
         public PrinterState CurrentState => state;
         public RecipeDef SelectedRecipe => selectedRecipe;
-        public int Progress => progress;
-
-        public override void PostSpawnSetup(bool respawningAfterLoad)
-        {
-            base.PostSpawnSetup(respawningAfterLoad);
-            
-            if (Props.supportedRecipes != null && Props.supportedRecipes.Count > 0)
-            {
-                state = PrinterState.NoRecipe;
-            }
-        }
 
         public override void CompTick()
         {
             base.CompTick();
+            if (state != PrinterState.Processing) return;
 
-            if (state == PrinterState.Stopped || state == PrinterState.Idle)
-                return;
+            var power = parent.GetComp<CompPowerTrader>();
+            if (power != null && !power.PowerOn) return;
 
-            var powerComp = parent.GetComp<CompPowerTrader>();
-            bool hasPower = powerComp == null || powerComp.PowerOn;
-
-            if (!hasPower)
-            {
-                if (state == PrinterState.Processing)
-                    state = PrinterState.Paused;
-                return;
-            }
-
-            if (state == PrinterState.Paused && hasPower)
-            {
-                state = PrinterState.Processing;
-            }
-
-            if (state == PrinterState.Processing)
-            {
-                progress++;
-                if (progress >= ticksToComplete)
-                {
-                    FinishProcessing();
-                }
-            }
+            workDone++;
+            if (workDone >= workNeeded) FinishWork();
         }
 
-        private void FinishProcessing()
+        private void FinishWork()
         {
             if (selectedRecipe == null) return;
-
             var map = parent.Map;
             var pos = parent.Position;
 
             foreach (var product in selectedRecipe.products)
             {
-                int count = product.count;
-                for (int i = 0; i < count; i++)
-                {
-                    Thing thing = ThingMaker.MakeThing(product.thingDef);
-                    GenPlace.TryPlaceThing(thing, pos, map, ThingPlaceMode.Near);
-                }
+                Thing thing = ThingMaker.MakeThing(product.thingDef);
+                thing.stackCount = product.count;
+                // Исправленный вызов - просто спавним предмет
+                GenSpawn.Spawn(thing, pos, map);
             }
-
-            // После завершения снова ждём ингредиенты
             state = PrinterState.WaitingForIngredients;
-            progress = 0;
+            workDone = 0;
         }
 
-        public bool ShouldBeWorkedOn(Pawn pawn)
+        public bool NeedsWorkNow(Pawn pawn)
         {
-            // Только если ждём ингредиенты и выбран рецепт
-            if (selectedRecipe == null) return false;
             if (state != PrinterState.WaitingForIngredients) return false;
-            
-            var powerComp = parent.GetComp<CompPowerTrader>();
-            if (powerComp != null && !powerComp.PowerOn) return false;
-            
-            // Проверяем наличие ингредиентов
-            return HasIngredientsAvailable(pawn);
-        }
-
-        private bool HasIngredientsAvailable(Pawn pawn)
-        {
             if (selectedRecipe == null) return false;
 
+            var power = parent.GetComp<CompPowerTrader>();
+            if (power != null && !power.PowerOn) return false;
+
+            return HasEnoughIngredients(pawn);
+        }
+
+        private bool HasEnoughIngredients(Pawn pawn)
+        {
+            if (selectedRecipe == null) return false;
             var map = parent.Map;
-            var pos = parent.Position;
+            float totalNutrition = 0f;
+            HashSet<Thing> checkedThings = new HashSet<Thing>();
 
-            foreach (var ingredientDef in selectedRecipe.ingredients)
+            foreach (var cell in GenRadial.RadialCellsAround(parent.Position, 8, true))
             {
-                float required = ingredientDef.GetBaseCount();
-                float found = 0;
-
-                // Ищем в радиусе от принтера
-                var cells = GenRadial.RadialCellsAround(pos, INGREDIENT_SEARCH_RADIUS, true);
-                foreach (var cell in cells)
+                foreach (var thing in cell.GetThingList(map))
                 {
-                    if (found >= required) break;
+                    if (checkedThings.Contains(thing)) continue;
+                    if (thing.IsForbidden(pawn)) continue;
+                    if (!pawn.CanReserve(thing)) continue;
 
-                    var things = cell.GetThingList(map);
-                    foreach (var thing in things)
+                    foreach (var ing in selectedRecipe.ingredients)
                     {
-                        if (found >= required) break;
-                        if (!ingredientDef.filter.Allows(thing.def)) continue;
-                        if (thing.IsForbidden(pawn)) continue;
-                        if (!pawn.CanReserve(thing)) continue;
-
-                        found += thing.stackCount;
+                        if (ing.filter.Allows(thing.def))
+                        {
+                            checkedThings.Add(thing);
+                            totalNutrition += thing.GetStatValue(StatDefOf.Nutrition) * thing.stackCount;
+                            break;
+                        }
                     }
                 }
-
-                if (found < required)
-                    return false;
             }
 
-            return true;
+            float required = selectedRecipe.ingredients.Sum(i => i.GetBaseCount());
+            return totalNutrition >= required;
         }
 
-        public void TryStartMachine(Pawn pawn)
+        public void StartWorking(Pawn pawn)
         {
-            if (selectedRecipe == null) return;
-            if (state != PrinterState.WaitingForIngredients) return;
+            if (state != PrinterState.WaitingForIngredients || selectedRecipe == null) return;
+            if (!ConsumeIngredients(pawn)) return;
 
-            // Потребляем ингредиенты
-            if (!ConsumeIngredients(pawn))
-            {
-                return;
-            }
-
+            workNeeded = selectedRecipe.workAmount > 0 ? Mathf.CeilToInt(selectedRecipe.workAmount) : Props.baseWorkAmount;
+            workDone = 0;
             state = PrinterState.Processing;
-            progress = 0;
-            ticksToComplete = Props.GetWorkAmountForRecipe(selectedRecipe);
         }
 
         private bool ConsumeIngredients(Pawn pawn)
         {
-            if (selectedRecipe == null) return false;
-
             var map = parent.Map;
-            var pos = parent.Position;
+            float needed = selectedRecipe.ingredients.Sum(i => i.GetBaseCount());
+            float consumed = 0f;
 
-            foreach (var ingredientDef in selectedRecipe.ingredients)
+            foreach (var cell in GenRadial.RadialCellsAround(parent.Position, 8, true))
             {
-                float required = ingredientDef.GetBaseCount();
-                float consumed = 0;
-
-                var cells = GenRadial.RadialCellsAround(pos, INGREDIENT_SEARCH_RADIUS, true);
-                foreach (var cell in cells)
+                if (consumed >= needed) break;
+                foreach (var thing in cell.GetThingList(map).ToList())
                 {
-                    if (consumed >= required) break;
+                    if (consumed >= needed) break;
+                    if (thing.IsForbidden(pawn)) continue;
 
-                    var things = cell.GetThingList(map).ToList();
-                    foreach (var thing in things)
+                    foreach (var ing in selectedRecipe.ingredients)
                     {
-                        if (consumed >= required) break;
-                        if (!ingredientDef.filter.Allows(thing.def)) continue;
-                        if (thing.IsForbidden(pawn)) continue;
+                        if (!ing.filter.Allows(thing.def)) continue;
+                        float nutritionPerItem = thing.GetStatValue(StatDefOf.Nutrition);
+                        float remaining = needed - consumed;
+                        int itemsNeeded = Mathf.CeilToInt(remaining / nutritionPerItem);
 
-                        float toConsume = Mathf.Min(required - consumed, thing.stackCount);
-                        if (toConsume >= thing.stackCount)
+                        if (itemsNeeded >= thing.stackCount)
                         {
-                            consumed += thing.stackCount;
+                            consumed += nutritionPerItem * thing.stackCount;
                             thing.Destroy(DestroyMode.Vanish);
                         }
                         else
                         {
-                            thing.stackCount -= Mathf.CeilToInt(toConsume);
-                            consumed += toConsume;
+                            consumed += nutritionPerItem * itemsNeeded;
+                            thing.stackCount -= itemsNeeded;
                         }
+                        break;
                     }
                 }
-
-                if (consumed < required)
-                    return false;
             }
-
-            return true;
-        }
-
-        public Job GetJobFor(Pawn pawn, Thing target)
-        {
-            return JobMaker.MakeJob(_3DPrintersJobDefOf.Operate3DPrinter, target);
+            return consumed >= needed - 0.001f;
         }
 
         public void SelectRecipe(RecipeDef recipe)
         {
             selectedRecipe = recipe;
-            state = PrinterState.WaitingForIngredients;  // ВАЖНО: сразу WaitingForIngredients
-            progress = 0;
-            ticksToComplete = Props.GetWorkAmountForRecipe(recipe);
+            state = PrinterState.WaitingForIngredients;
+            workDone = 0;
+        }
+
+        public void StopMachine()
+        {
+            state = PrinterState.Stopped;
+        }
+
+        public void ResumeMachine()
+        {
+            state = selectedRecipe != null ? PrinterState.WaitingForIngredients : PrinterState.NoRecipe;
         }
 
         public IEnumerable<Gizmo> GetGizmos()
         {
-            if (Props == null || Props.supportedRecipes == null || Props.supportedRecipes.Count == 0)
-            {
-                yield break;
-            }
+            if (Props?.supportedRecipes == null || Props.supportedRecipes.Count == 0) yield break;
 
-            // Кнопка выбора рецепта
-            string currentLabel = "Select recipe";
-            if (selectedRecipe != null)
-            {
-                currentLabel = selectedRecipe.label ?? selectedRecipe.defName;
-            }
-            
-            var recipeOptions = new List<FloatMenuOption>();
-            
+            string currentLabel = selectedRecipe != null ? selectedRecipe.label : "Select recipe";
+            var options = new List<FloatMenuOption>();
             foreach (var recipe in Props.supportedRecipes)
             {
-                string recipeName = recipe.label ?? recipe.defName;
-                
-                recipeOptions.Add(new FloatMenuOption(
-                    recipeName,
-                    () => SelectRecipe(recipe),
-                    TexCommand.DesirePower,
-                    Color.white
-                ));
+                var r = recipe;
+                options.Add(new FloatMenuOption(r.label, () => SelectRecipe(r), TexCommand.DesirePower, Color.white));
             }
-            
+
             yield return new Command_Action
             {
                 defaultLabel = "Recipe: " + currentLabel,
-                defaultDesc = "Click to select recipe.",
+                defaultDesc = "Click to select recipe",
                 icon = TexCommand.DesirePower,
-                action = () =>
-                {
-                    Find.WindowStack.Add(new FloatMenu(recipeOptions));
-                }
+                action = () => Find.WindowStack.Add(new FloatMenu(options))
             };
 
-            // Кнопка остановки
-            if (state == PrinterState.Processing || state == PrinterState.WaitingForIngredients || state == PrinterState.Paused)
-            {
+            if (state == PrinterState.Processing || state == PrinterState.WaitingForIngredients)
                 yield return new Command_Action
                 {
-                    defaultLabel = "Stop production",
-                    defaultDesc = "Stop the production process.",
+                    defaultLabel = "Stop",
+                    defaultDesc = "Stop production",
                     icon = TexCommand.ForbidOn,
-                    action = () =>
-                    {
-                        state = PrinterState.Stopped;
-                        progress = 0;
-                    }
+                    action = () => StopMachine()
                 };
-            }
-            // Кнопка возобновления
             else if (state == PrinterState.Stopped)
-            {
                 yield return new Command_Action
                 {
-                    defaultLabel = "Resume production",
-                    defaultDesc = "Resume the production process.",
+                    defaultLabel = "Resume",
+                    defaultDesc = "Resume production",
                     icon = TexCommand.ForbidOff,
-                    action = () =>
-                    {
-                        if (selectedRecipe != null)
-                        {
-                            state = PrinterState.WaitingForIngredients;
-                        }
-                        else
-                        {
-                            state = PrinterState.NoRecipe;
-                        }
-                        progress = 0;
-                    }
+                    action = () => ResumeMachine()
                 };
-            }
         }
 
-        public override string CompInspectStringExtra()
+        public string GetInspectStringExtra()
         {
-            // Возвращаем только дополнительную информацию
-            // Базовая GetInspectString покажет состояние из самого Building
-            if (selectedRecipe != null)
+            if (selectedRecipe == null) return "No recipe selected";
+
+            string status = "";
+            switch (state)
             {
-                string recipeLabel = selectedRecipe.label ?? selectedRecipe.defName;
-                string statusText = "";
-                
-                switch (state)
-                {
-                    case PrinterState.WaitingForIngredients:
-                        statusText = "Waiting for ingredients";
-                        break;
-                    case PrinterState.Processing:
-                        float pct = (float)progress / ticksToComplete * 100f;
-                        statusText = $"Processing: {pct:F0}%";
-                        break;
-                    case PrinterState.Paused:
-                        statusText = "Paused (no power)";
-                        break;
-                    case PrinterState.Stopped:
-                        statusText = "Stopped";
-                        break;
-                }
-                
-                if (!string.IsNullOrEmpty(statusText))
-                    return $"{statusText}\nRecipe: {recipeLabel}";
-                else
-                    return $"Recipe: {recipeLabel}";
+                case PrinterState.WaitingForIngredients: status = "Waiting for ingredients"; break;
+                case PrinterState.Processing: status = "Processing: " + ((float)workDone / workNeeded * 100f).ToString("F0") + "%"; break;
+                case PrinterState.Stopped: status = "Stopped"; break;
             }
-            
-            return null;
+
+            return status + "\nRecipe: " + selectedRecipe.label;
         }
 
         public override void PostExposeData()
@@ -482,28 +357,15 @@ namespace _3DPrinters
             base.PostExposeData();
             Scribe_Values.Look(ref state, "state", PrinterState.NoRecipe);
             Scribe_Defs.Look(ref selectedRecipe, "selectedRecipe");
-            Scribe_Values.Look(ref progress, "progress", 0);
-            Scribe_Values.Look(ref ticksToComplete, "ticksToComplete", 0);
+            Scribe_Values.Look(ref workDone, "workDone", 0);
+            Scribe_Values.Look(ref workNeeded, "workNeeded", 0);
         }
     }
 
-    // ==================== CompProperties ====================
     public class CompProperties_AutoProcessor : CompProperties
     {
         public int baseWorkAmount = 500;
-        public bool autoStartOnLoad = true;
         public List<RecipeDef> supportedRecipes;
-
-        public CompProperties_AutoProcessor()
-        {
-            compClass = typeof(CompAutoProcessor);
-        }
-
-        public int GetWorkAmountForRecipe(RecipeDef recipe)
-        {
-            if (recipe.workAmount > 0)
-                return Mathf.CeilToInt(recipe.workAmount);
-            return baseWorkAmount;
-        }
+        public CompProperties_AutoProcessor() => compClass = typeof(CompAutoProcessor);
     }
 }

@@ -43,7 +43,7 @@
 
     <statBases>
       <Mass>10</Mass>
-      <WorkToBuild>2000</WorkToBuild>
+      <WorkToBuild>5000</WorkToBuild>
     </statBases>
     
     <designationCategory>_3DPrinters</designationCategory>
@@ -55,13 +55,11 @@
     <comps>
       <li Class="_3DPrinters.CompProperties_AutoProcessor">
         <baseWorkAmount>4000</baseWorkAmount>
-        <autoStartOnLoad>true</autoStartOnLoad>
         <supportedRecipes>
           <li>MakeNutrientPaste</li>
         </supportedRecipes>
       </li>
       
-      <!-- Компонент энергии -->
       <li Class="CompProperties_Power">
         <compClass>CompPowerTrader</compClass>
         <basePowerConsumption>50</basePowerConsumption>
