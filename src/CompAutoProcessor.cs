@@ -13,7 +13,6 @@ namespace _3DPrinters
         public static JobDef Operate3DPrinter;
     }
 
-    // WorkGiver с привязкой к конкретному WorkType (Crafting)
     public class WorkGiver_Operate3DPrinter : WorkGiver_Scanner
     {
         public override ThingRequest PotentialWorkThingRequest => 
@@ -31,7 +30,6 @@ namespace _3DPrinters
                 var comp = building.TryGetComp<CompAutoProcessor>();
                 if (comp == null) continue;
                 
-                // Проверяем, что у колониста активен нужный тип работы
                 WorkTypeDef requiredWork = comp.Props.GetWorkTypeDef();
                 if (requiredWork == null) continue;
                 
@@ -52,7 +50,6 @@ namespace _3DPrinters
             var comp = t.TryGetComp<CompAutoProcessor>();
             if (comp == null) return false;
             
-            // Проверяем тип работы
             WorkTypeDef requiredWork = comp.Props.GetWorkTypeDef();
             if (requiredWork == null) return false;
             if (pawn.workSettings != null && !pawn.workSettings.WorkIsActive(requiredWork) && !forced)
@@ -107,16 +104,7 @@ namespace _3DPrinters
             var comp = GetComp<CompAutoProcessor>();
             if (comp == null) yield break;
 
-            if (comp.Props != null && comp.Props.supportedRecipes != null && comp.Props.supportedRecipes.Count > 0)
-            {
-                foreach (var recipe in comp.Props.supportedRecipes)
-                {
-                    var r = recipe;
-                    TaggedString labelTag = "_3DPrinters.SelectRecipeFloat".Translate(r.label);
-                    string label = labelTag.ToString();
-                    yield return new FloatMenuOption(label, () => comp.SelectRecipe(r));
-                }
-            }
+            // УБРАНЫ пункты выбора рецепта через ПКМ
 
             if (comp.CurrentState == PrinterState.WaitingForIngredients && comp.SelectedRecipe != null)
             {
@@ -244,31 +232,35 @@ namespace _3DPrinters
         {
             if (selectedRecipe == null) return false;
             var map = parent.Map;
-            float totalNutrition = 0f;
-            HashSet<Thing> checkedThings = new HashSet<Thing>();
-
-            foreach (var cell in GenRadial.RadialCellsAround(parent.Position, 8, true))
+            
+            foreach (var ingredientDef in selectedRecipe.ingredients)
             {
-                foreach (var thing in cell.GetThingList(map))
+                float required = ingredientDef.GetBaseCount();
+                float found = 0f;
+                HashSet<Thing> checkedThings = new HashSet<Thing>();
+
+                foreach (var cell in GenRadial.RadialCellsAround(parent.Position, 8, true))
                 {
-                    if (checkedThings.Contains(thing)) continue;
-                    if (thing.IsForbidden(pawn)) continue;
-                    if (!pawn.CanReserve(thing)) continue;
+                    if (found >= required) break;
                     
-                    foreach (var ing in selectedRecipe.ingredients)
+                    foreach (var thing in cell.GetThingList(map))
                     {
-                        if (ing.filter.Allows(thing.def))
-                        {
-                            checkedThings.Add(thing);
-                            totalNutrition += thing.GetStatValue(StatDefOf.Nutrition) * thing.stackCount;
-                            break;
-                        }
+                        if (found >= required) break;
+                        if (checkedThings.Contains(thing)) continue;
+                        if (!ingredientDef.filter.Allows(thing.def)) continue;
+                        if (thing.IsForbidden(pawn)) continue;
+                        if (!pawn.CanReserve(thing)) continue;
+                        
+                        checkedThings.Add(thing);
+                        found += thing.stackCount;
                     }
                 }
+
+                if (found < required)
+                    return false;
             }
 
-            float required = selectedRecipe.ingredients.Sum(i => i.GetBaseCount());
-            return totalNutrition >= required;
+            return true;
         }
 
         public void StartWorking(Pawn pawn)
@@ -284,39 +276,44 @@ namespace _3DPrinters
         private bool ConsumeIngredients(Pawn pawn)
         {
             var map = parent.Map;
-            float needed = selectedRecipe.ingredients.Sum(i => i.GetBaseCount());
-            float consumed = 0f;
-
-            foreach (var cell in GenRadial.RadialCellsAround(parent.Position, 8, true))
+            
+            foreach (var ingredientDef in selectedRecipe.ingredients)
             {
-                if (consumed >= needed) break;
-                foreach (var thing in cell.GetThingList(map).ToList())
+                float required = ingredientDef.GetBaseCount();
+                float consumed = 0f;
+
+                foreach (var cell in GenRadial.RadialCellsAround(parent.Position, 8, true))
                 {
-                    if (consumed >= needed) break;
-                    if (thing.IsForbidden(pawn)) continue;
+                    if (consumed >= required) break;
                     
-                    foreach (var ing in selectedRecipe.ingredients)
+                    var things = cell.GetThingList(map).ToList();
+                    foreach (var thing in things)
                     {
-                        if (!ing.filter.Allows(thing.def)) continue;
-                        float nutritionPerItem = thing.GetStatValue(StatDefOf.Nutrition);
-                        float remaining = needed - consumed;
-                        int itemsNeeded = Mathf.CeilToInt(remaining / nutritionPerItem);
+                        if (consumed >= required) break;
+                        if (!ingredientDef.filter.Allows(thing.def)) continue;
+                        if (thing.IsForbidden(pawn)) continue;
+
+                        float toConsume = required - consumed;
+                        int itemsToTake = Mathf.CeilToInt(toConsume);
                         
-                        if (itemsNeeded >= thing.stackCount)
+                        if (itemsToTake >= thing.stackCount)
                         {
-                            consumed += nutritionPerItem * thing.stackCount;
+                            consumed += thing.stackCount;
                             thing.Destroy(DestroyMode.Vanish);
                         }
                         else
                         {
-                            consumed += nutritionPerItem * itemsNeeded;
-                            thing.stackCount -= itemsNeeded;
+                            consumed += itemsToTake;
+                            thing.stackCount -= itemsToTake;
                         }
-                        break;
                     }
                 }
+
+                if (consumed < required)
+                    return false;
             }
-            return consumed >= needed - 0.001f;
+
+            return true;
         }
 
         public void SelectRecipe(RecipeDef recipe)

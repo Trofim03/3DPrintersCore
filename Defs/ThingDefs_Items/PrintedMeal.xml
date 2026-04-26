@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+  <ThingDef ParentName="MealBase">
+    <defName>PrintedMeal</defName>
+    <label>Printed meal</label>
+    <description>3D printed food looks no better than food paste, but tastes and smells better than the original. Due to the many treatments, it is not clear whether anyone was harmed during cooking, therefore it is suitable for both vegetarians and meat-eaters</description>
+    
+    <graphicData>
+      <texPath>Things/PrintedMeal</texPath>
+      <graphicClass>Graphic_Single</graphicClass>
+      <drawSize>(1,1)</drawSize>
+    </graphicData>
+    
+    <statBases>
+      <Nutrition>0.8</Nutrition>
+      <Mass>0.44</Mass>
+      <MarketValue>15</MarketValue>
+    </statBases>
+    
+    <stackLimit>10</stackLimit>
+    
+    <ingestible>
+      <foodType>Meal</foodType>
+      <preferability>MealSimple</preferability>
+      <maxNumToIngestAtOnce>1</maxNumToIngestAtOnce>
+      <outcomeDoers>
+        <li Class="IngestionOutcomeDoer_GiveHediff">
+          <hediffDef>FoodPoisoning</hediffDef>
+          <chance>0.001</chance>
+        </li>
+      </outcomeDoers>
+    </ingestible>
+    
+    <comps>
+      <li Class="CompProperties_Rottable">
+        <daysToRotStart>3</daysToRotStart>
+      </li>
+    </comps>
+    
+    <soundInteract>Interact_Meal</soundInteract>
+    <soundDrop>Drop_Meal</soundDrop>
+    
+    <!-- FoodMeals убрана, так как уже наследуется от MealBase -->
+    <thingCategories>
+      <li>Foods</li>
+    </thingCategories>
+  </ThingDef>
+</Defs>

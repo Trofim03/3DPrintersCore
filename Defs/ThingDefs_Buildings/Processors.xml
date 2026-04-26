@@ -68,6 +68,8 @@
         <supportedRecipes>
           <li>MakeNutrientPaste</li>
           <li>MakeNutrientPasteTen</li>
+          <li>MakePrintedMeal</li>
+          <li>MakePrintedMealTen</li>
         </supportedRecipes>
       </li>
       <li Class="CompProperties_Power">

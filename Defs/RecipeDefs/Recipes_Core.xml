@@ -23,7 +23,7 @@
 
   <RecipeDef>
     <defName>MakeNutrientPasteTen</defName>
-    <label>Make nutrient paste (10 piece)</label>
+    <label>Make nutrient paste (10 pieces)</label>
     <description>Process raw food into nutrient paste for 3D printers.</description>
     <jobString>Processing nutrient paste.</jobString>
     <workAmount>6000</workAmount>
@@ -39,6 +39,48 @@
     </ingredients>
     <products>
       <NutrientPasteRaw>10</NutrientPasteRaw>
+    </products>
+  </RecipeDef>
+
+  <RecipeDef>
+    <defName>MakePrintedMeal</defName>
+    <label>Make Printed meal (1 piece)</label>
+    <description>The process of processing raw materials into synthesized meal</description>
+    <jobString>Processing Printed meal.</jobString>
+    <workAmount>1500</workAmount>
+    <ingredients>
+      <li>
+        <filter>
+          <thingDefs>
+            <li>NutrientPasteRaw</li>
+          </thingDefs>
+        </filter>
+        <count>1</count>
+      </li>
+    </ingredients>
+    <products>
+      <PrintedMeal>1</PrintedMeal>
+    </products>
+  </RecipeDef>
+
+  <RecipeDef>
+    <defName>MakePrintedMealTen</defName>
+    <label>Make Printed meal (10 pieces)</label>
+    <description>The process of processing raw materials into synthesized meal</description>
+    <jobString>Processing Printed meal.</jobString>
+    <workAmount>8000</workAmount>
+    <ingredients>
+      <li>
+        <filter>
+          <thingDefs>
+            <li>NutrientPasteRaw</li>
+          </thingDefs>
+        </filter>
+        <count>10</count>
+      </li>
+    </ingredients>
+    <products>
+      <PrintedMeal>10</PrintedMeal>
     </products>
   </RecipeDef>
 </Defs>
