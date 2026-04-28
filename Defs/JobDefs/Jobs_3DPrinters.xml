@@ -5,4 +5,9 @@
     <driverClass>_3DPrinters.JobDriver_Operate3DPrinter</driverClass>
     <reportString>Operating 3D printer.</reportString>
   </JobDef>
+  <JobDef>
+    <defName>HaulToPrinter</defName>
+    <driverClass>_3DPrinters.JobDriver_HaulToPrinter</driverClass>
+    <reportString>Hauling ingredients to 3D printer.</reportString>
+  </JobDef>
 </Defs>

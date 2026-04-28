@@ -24,4 +24,13 @@
   <_3DPrinters.RecipeLabel>Рецепт: {0}</_3DPrinters.RecipeLabel>
 
   <_3DPrinters.IngredientsReturned>Ингредиенты возвращены перед принтером.</_3DPrinters.IngredientsReturned>
+
+  <_3DPrinters.LoadedIngredients>Загружено</_3DPrinters.LoadedIngredients>
+
+  <_3DPrinters.HaulToPrinterFloat>Загрузить ингредиенты в принтер</_3DPrinters.HaulToPrinterFloat>
+  <_3DPrinters.NoIngredientsAvailable>Нет доступных ингредиентов на карте</_3DPrinters.NoIngredientsAvailable>
+
+  <_3DPrinters.HaulToPrinterDisabled>Поселенец не назначен заниматься переноской</_3DPrinters.HaulToPrinterDisabled>
+  <_3DPrinters.ForceOperateDisabled>Поселенец не назначен работать как {0}</_3DPrinters.ForceOperateDisabled>
+  <_3DPrinters.ForceOperateMissingIngredients>Не хватает ингредиентов</_3DPrinters.ForceOperateMissingIngredients>
 </LanguageData>

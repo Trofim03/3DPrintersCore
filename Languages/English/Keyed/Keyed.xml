@@ -24,4 +24,12 @@
   <_3DPrinters.RecipeLabel>Recipe: {0}</_3DPrinters.RecipeLabel>
 
   <_3DPrinters.IngredientsReturned>Ingredients returned in front of the printer.</_3DPrinters.IngredientsReturned>
+
+  <_3DPrinters.LoadedIngredients>Loaded</_3DPrinters.LoadedIngredients>
+  <_3DPrinters.HaulToPrinterFloat>Load ingredients into printer</_3DPrinters.HaulToPrinterFloat>
+  <_3DPrinters.NoIngredientsAvailable>No available ingredients on the map</_3DPrinters.NoIngredientsAvailable>
+
+  <_3DPrinters.HaulToPrinterDisabled>Colonist is not assigned to hauling</_3DPrinters.HaulToPrinterDisabled>
+  <_3DPrinters.ForceOperateDisabled>Colonist is not assigned as {0}</_3DPrinters.ForceOperateDisabled>
+  <_3DPrinters.ForceOperateMissingIngredients>Missing ingredients</_3DPrinters.ForceOperateMissingIngredients>
 </LanguageData>

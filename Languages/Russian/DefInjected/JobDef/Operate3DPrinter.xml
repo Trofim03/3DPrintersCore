@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LanguageData>
   <Operate3DPrinter.reportString>Обслуживание 3D принтера.</Operate3DPrinter.reportString>
+  <HaulToPrinter.reportString>Переносит ингредиенты к 3D принтеру.</HaulToPrinter.reportString>
 </LanguageData>

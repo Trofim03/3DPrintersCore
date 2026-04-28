@@ -12,4 +12,17 @@
     </requiredCapacities>
     <directOrderable>true</directOrderable>
   </WorkGiverDef>
+
+   <WorkGiverDef>
+    <defName>HaulToPrinter</defName>
+    <giverClass>_3DPrinters.WorkGiver_HaulToPrinter</giverClass>
+    <workType>Hauling</workType>
+    <priorityInType>60</priorityInType>
+    <verb>haul</verb>
+    <gerund>hauling</gerund>
+    <requiredCapacities>
+      <li>Manipulation</li>
+    </requiredCapacities>
+    <directOrderable>false</directOrderable>
+  </WorkGiverDef>
 </Defs>
