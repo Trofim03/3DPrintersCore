@@ -3,7 +3,7 @@
     <HugsLib.UpdateFeatureDef Abstract="true" Name="UpdateFeatureBase">
         <modNameReadable>3D Printers Core</modNameReadable>
         <modIdentifier>DrLiveseyyy.3DPrintersCore</modIdentifier>
-        <linkUrl>steam://url/CommunityFilePage/ID_ТВОЕГО_МОДА</linkUrl>
+        <linkUrl>steam://url/CommunityFilePage/3714941146</linkUrl>
     </HugsLib.UpdateFeatureDef>
 
     <!-- <HugsLib.UpdateFeatureDef ParentName="UpdateFeatureBase">
