@@ -24,28 +24,6 @@
     <recipeMaker>
       <researchPrerequisite>NutrientRefiningTech</researchPrerequisite>
     </recipeMaker>
-      <!-- 
-      Firefighter	Тушение пожаров
-      Patient	Пациент
-      Doctor	Врач
-      PatientBedRest	Постельный режим
-      Flicker	Переключение
-      Warden	Надзиратель
-      Handling	Животноводство
-      Cooking	Готовка
-      Hunting	Охота
-      Construction	Строительство
-      Growing	Растениеводство
-      Mining	Горное дело
-      PlantCutting	Вырубка растений
-      Smithing	Кузнечное дело
-      Tailoring	Портняжное дело
-      Art	Искусство
-      Crafting	Ремесло
-      Hauling	Переноска
-      Cleaning	Уборка
-      Research	Исследование
-      -->
     <comps>
       <li Class="_3DPrinters.CompProperties_AutoProcessor">
         <baseWorkAmount>4000</baseWorkAmount>
@@ -63,5 +41,12 @@
     <researchPrerequisites>
       <li>NutrientRefiningTech</li>
     </researchPrerequisites>
+
+    <descriptionHyperlinks>
+      <ThingDef>PrintedMeal</ThingDef>
+      <RecipeDef>MakePrintedMeal</RecipeDef>
+      <RecipeDef>MakePrintedMealTen</RecipeDef>
+      <ThingDef>NutrientPasteRaw</ThingDef>
+    </descriptionHyperlinks>
   </ThingDef>
 </Defs>

@@ -48,5 +48,11 @@
     <thingCategories>
       <li>Foods</li>
     </thingCategories>
+
+    <descriptionHyperlinks>
+      <RecipeDef>MakePrintedMeal</RecipeDef>
+      <RecipeDef>MakePrintedMealTen</RecipeDef>
+      <ThingDef>FoodPrinter</ThingDef>
+    </descriptionHyperlinks>
   </ThingDef>
 </Defs>

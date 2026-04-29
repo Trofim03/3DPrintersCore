@@ -19,6 +19,11 @@
     <products>
       <NutrientPasteRaw>1</NutrientPasteRaw>
     </products>
+
+    <descriptionHyperlinks>
+      <ThingDef>NutrientPasteRaw</ThingDef>
+      <ThingDef>NutrientRefinery</ThingDef>
+    </descriptionHyperlinks>
   </RecipeDef>
 
   <RecipeDef>
@@ -40,6 +45,11 @@
     <products>
       <NutrientPasteRaw>10</NutrientPasteRaw>
     </products>
+
+    <descriptionHyperlinks>
+      <ThingDef>NutrientPasteRaw</ThingDef>
+      <ThingDef>NutrientRefinery</ThingDef>
+    </descriptionHyperlinks>
   </RecipeDef>
 
   <RecipeDef>
@@ -61,6 +71,12 @@
     <products>
       <PrintedMeal>1</PrintedMeal>
     </products>
+
+    <descriptionHyperlinks>
+      <ThingDef>NutrientPasteRaw</ThingDef>
+      <ThingDef>PrintedMeal</ThingDef>
+      <ThingDef>FoodPrinter</ThingDef>
+    </descriptionHyperlinks>
   </RecipeDef>
 
   <RecipeDef>
@@ -82,5 +98,11 @@
     <products>
       <PrintedMeal>10</PrintedMeal>
     </products>
+
+    <descriptionHyperlinks>
+      <ThingDef>NutrientPasteRaw</ThingDef>
+      <ThingDef>PrintedMeal</ThingDef>
+      <ThingDef>FoodPrinter</ThingDef>
+    </descriptionHyperlinks>
   </RecipeDef>
 </Defs>
