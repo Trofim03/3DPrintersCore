@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+    <HugsLib.UpdateFeatureDef Abstract="true" Name="UpdateFeatureBase">
+        <modNameReadable>3D Printers Core</modNameReadable>
+        <modIdentifier>DrLiveseyyy.3DPrintersCore</modIdentifier>
+        <linkUrl>steam://url/CommunityFilePage/ID_ТВОЕГО_МОДА</linkUrl>
+    </HugsLib.UpdateFeatureDef>
+
+    <!-- <HugsLib.UpdateFeatureDef ParentName="UpdateFeatureBase">
+        <defName>3DPrinters_1_0_0</defName>
+        <assemblyVersion>1.0.0</assemblyVersion>
+        <content>Вышла версия 1.0.0 мода 3D Printers Core!
+
+        Что нового:
+        - Добавлены базовые 3D принтеры
+        - Печать питательной пасты
+        - Печать готовых блюд</content>
+    </HugsLib.UpdateFeatureDef> -->
+</Defs>
