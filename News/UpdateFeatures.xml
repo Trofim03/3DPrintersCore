@@ -6,14 +6,15 @@
         <linkUrl>steam://url/CommunityFilePage/3714941146</linkUrl>
     </HugsLib.UpdateFeatureDef>
 
-    <!-- <HugsLib.UpdateFeatureDef ParentName="UpdateFeatureBase">
-        <defName>3DPrinters_1_0_0</defName>
-        <assemblyVersion>1.0.0</assemblyVersion>
-        <content>Вышла версия 1.0.0 мода 3D Printers Core!
+    <HugsLib.UpdateFeatureDef ParentName="UpdateFeatureBase">
+        <defName>3DPrinters_1_1_0</defName>
+        <assemblyVersion>1.1.0</assemblyVersion>
+        <content>
+        Вышла версия 1.1.0 мода 3D Printers Core!
 
         Что нового:
-        - Добавлены базовые 3D принтеры
-        - Печать питательной пасты
-        - Печать готовых блюд</content>
-    </HugsLib.UpdateFeatureDef> -->
+        - Исправленны некоторые ошибки при работе с принтерами
+        - Вышло дополнение на печать базовых протезов (Ищите в мастерской от того же разработчика)
+        </content>
+    </HugsLib.UpdateFeatureDef>
 </Defs>
