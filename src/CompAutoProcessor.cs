@@ -557,7 +557,25 @@ namespace _3DPrinters
         public void AddIngredient(ThingDef def, int count)
         {
             if (def == null || count <= 0) return;
-            if (loadedIngredients == null) loadedIngredients = new List<Thing>();
+
+            // Если принтер остановлен — сбрасываем ресурс рядом
+            if (state == PrinterState.Stopped)
+            {
+                var map = parent.Map;
+                if (map != null)
+                {
+                    Thing droppedThing = ThingMaker.MakeThing(def);
+                    if (droppedThing != null)
+                    {
+                        droppedThing.stackCount = count;
+                        GenPlace.TryPlaceThing(droppedThing, parent.Position, map, ThingPlaceMode.Near);
+                    }
+                }
+                return;
+            }
+
+            if (loadedIngredients == null)
+                loadedIngredients = new List<Thing>();
 
             var existing = loadedIngredients.FirstOrDefault(t => t != null && t.def == def);
             if (existing != null)
