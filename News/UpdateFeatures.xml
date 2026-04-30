@@ -10,11 +10,19 @@
         <defName>3DPrinters_1_1_0</defName>
         <assemblyVersion>1.1.0</assemblyVersion>
         <content>
+        [Russian]
         Вышла версия 1.1.0 мода 3D Printers Core!
 
         Что нового:
         - Исправленны некоторые ошибки при работе с принтерами
         - Вышло дополнение на печать базовых протезов (Ищите в мастерской от того же разработчика)
+
+        [English]
+        Version 1.1.0 of the 3D Printers Core mod has been released! 
+        
+        What's new: 
+        - Some errors when working with printers have been fixed 
+        - An add-on has been released for printing basic prostheses (Look in the workshop from the same developer)
         </content>
     </HugsLib.UpdateFeatureDef>
 </Defs>
