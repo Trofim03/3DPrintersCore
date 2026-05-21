@@ -25,4 +25,22 @@
         - An add-on has been released for printing basic prostheses (Look in the workshop from the same developer)
         </content>
     </HugsLib.UpdateFeatureDef>
+
+    <HugsLib.UpdateFeatureDef ParentName="UpdateFeatureBase">
+        <defName>3DPrinters_1_1_1</defName>
+        <assemblyVersion>1.1.1</assemblyVersion>
+        <content>
+        [Russian]
+        Вышла версия 1.1.1 мода 3D Printers Core!
+
+        Что нового:
+        - Изменение текстур для основного мода
+
+        [English]
+        Version 1.1.1 of the 3D Printers Core mod has been released! 
+        
+        What's new: 
+        - Changing textures for the main mod
+        </content>
+    </HugsLib.UpdateFeatureDef>
 </Defs>
