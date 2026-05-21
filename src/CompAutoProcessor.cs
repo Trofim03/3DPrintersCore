@@ -121,10 +121,24 @@ namespace _3DPrinters
 
         public override bool TryMakePreToilReservations(bool errorOnFailed)
         {
-            if (!pawn.Reserve(job.targetA, job, 1, -1, null, errorOnFailed))
-                return false;
-            if (Ingredient != null && !Ingredient.Destroyed && Ingredient.Spawned && !pawn.Reserve(Ingredient, job, 1, -1, null, errorOnFailed))
-                return false;
+            if (Ingredient != null && !Ingredient.Destroyed && Ingredient.Spawned)
+            {
+                if (!pawn.Reserve(Ingredient, job, 1, -1, null, errorOnFailed))
+                {
+                    var comp = Printer?.GetComp<CompAutoProcessor>();
+                    if (comp != null)
+                    {
+                        var alternativeIngredient = comp.GetMissingIngredientForJob(pawn);
+                        if (alternativeIngredient != null && alternativeIngredient != Ingredient)
+                        {
+                            job.targetB = alternativeIngredient;
+                            job.count = comp.GetAmountNeeded(alternativeIngredient);
+                            return pawn.Reserve(alternativeIngredient, job, 1, -1, null, errorOnFailed);
+                        }
+                    }
+                    return false;
+                }
+            }
             return true;
         }
 
@@ -132,159 +146,39 @@ namespace _3DPrinters
         {
             this.FailOnDespawnedOrNull(TargetIndex.A);
 
-            // Toil 1: Подойти к ингредиенту (если есть) или к принтеру
             var gotoToil = new Toil();
             gotoToil.initAction = () =>
             {
-                if (Ingredient != null && !Ingredient.Destroyed && Ingredient.Spawned)
+                Thing targetIngredient = job.targetB.Thing;
+                if (targetIngredient != null && !targetIngredient.Destroyed && targetIngredient.Spawned)
                 {
-                    // Идём к ингредиенту
-                    pawn.pather.StartPath(Ingredient, PathEndMode.ClosestTouch);
+                    pawn.pather.StartPath(targetIngredient, PathEndMode.ClosestTouch);
                 }
                 else
                 {
-                    // Ингредиента нет — идём к принтеру и завершаем
-                    pawn.pather.StartPath(job.targetA.Thing, PathEndMode.Touch);
-                }
-            };
-            gotoToil.defaultCompleteMode = ToilCompleteMode.PatherArrival;
-            yield return gotoToil;
-
-            // Toil 2: Взять ингредиент или завершить если нет
-            var takeToil = new Toil
-            {
-                initAction = () =>
-                {
-                    if (Ingredient == null || Ingredient.Destroyed || !Ingredient.Spawned)
+                    var comp = Processor;
+                    if (comp != null)
                     {
-                        // Нечего брать — идём к принтеру
-                        return;
-                    }
-
-                    int toTake = Mathf.Min(AmountToTake, Ingredient.stackCount);
-
-                    if (toTake >= Ingredient.stackCount)
-                    {
-                        int stackCount = Ingredient.stackCount;
-                        pawn.carryTracker.TryStartCarry(Ingredient, stackCount);
-                        if (Ingredient.Spawned)
+                        var newIngredient = comp.GetMissingIngredientForJob(pawn);
+                        if (newIngredient != null)
                         {
-                            Ingredient.DeSpawn();
+                            job.targetB = newIngredient;
+                            job.count = comp.GetAmountNeeded(newIngredient);
+                            pawn.pather.StartPath(newIngredient, PathEndMode.ClosestTouch);
+                        }
+                        else
+                        {
+                            pawn.pather.StartPath(job.targetA.Thing, PathEndMode.Touch);
                         }
                     }
                     else
                     {
-                        Thing splitThing = Ingredient.SplitOff(toTake);
-                        if (splitThing != null)
-                        {
-                            pawn.carryTracker.TryStartCarry(splitThing, splitThing.stackCount);
-                        }
+                        pawn.pather.StartPath(job.targetA.Thing, PathEndMode.Touch);
                     }
-                },
-                defaultCompleteMode = ToilCompleteMode.Instant
+                }
             };
-            yield return takeToil;
-
-            // Toil 3: Отнести к принтеру
-            yield return Toils_Goto.GotoThing(TargetIndex.A, PathEndMode.Touch);
-
-            // Toil 4: Загрузить в принтер
-            var loadToil = new Toil
-            {
-                initAction = () =>
-                {
-                    if (Processor == null) return;
-
-                    Thing carried = pawn.carryTracker.CarriedThing;
-                    if (carried != null && !carried.Destroyed)
-                    {
-                        int count = carried.stackCount;
-                        Processor.AddIngredient(carried.def, count);
-                        carried.Destroy(DestroyMode.Vanish);
-                    }
-                },
-                defaultCompleteMode = ToilCompleteMode.Instant
-            };
-            yield return loadToil;
-        }
-    }
-
-    // JobDriver для запуска принтера
-    public class JobDriver_Operate3DPrinter : JobDriver
-    {
-        private CompAutoProcessor Processor => job.targetA.Thing?.TryGetComp<CompAutoProcessor>();
-
-        public override bool TryMakePreToilReservations(bool errorOnFailed)
-        {
-            return pawn.Reserve(job.targetA, job, 1, -1, null, errorOnFailed);
-        }
-
-        protected override IEnumerable<Toil> MakeNewToils()
-        {
-            this.FailOnDespawnedOrNull(TargetIndex.A);
-            this.FailOnBurningImmobile(TargetIndex.A);
-            yield return Toils_Goto.GotoThing(TargetIndex.A, PathEndMode.Touch);
-
-            var workToil = new Toil
-            {
-                initAction = () => Processor?.StartWorking(pawn),
-                defaultCompleteMode = ToilCompleteMode.Instant
-            };
-            yield return workToil;
-        }
-    }
-
-    // КОМБИНИРОВАННЫЙ JobDriver: переноска + запуск
-    public class JobDriver_OperatePrinterWithHaul : JobDriver
-    {
-        private Building_AutoProcessor Printer => (Building_AutoProcessor)job.targetA.Thing;
-        private CompAutoProcessor Processor => Printer?.GetComp<CompAutoProcessor>();
-
-        public override bool TryMakePreToilReservations(bool errorOnFailed)
-        {
-            return pawn.Reserve(job.targetA, job, 1, -1, null, errorOnFailed);
-        }
-
-        protected override IEnumerable<Toil> MakeNewToils()
-        {
-            this.FailOnDespawnedOrNull(TargetIndex.A);
-            this.FailOnBurningImmobile(TargetIndex.A);
-
-            var checkToil = new Toil
-            {
-                initAction = () =>
-                {
-                    if (Processor == null)
-                    {
-                        this.EndJobWith(JobCondition.Incompletable);
-                        return;
-                    }
-
-                    if (Processor.NeedsWorkNow(pawn))
-                    {
-                        this.ReadyForNextToil();
-                        return;
-                    }
-
-                    var missingIngredient = Processor.GetMissingIngredientForJob(pawn);
-                    if (missingIngredient == null || missingIngredient.Destroyed || !missingIngredient.Spawned)
-                    {
-                        Messages.Message("_3DPrinters.NoIngredientsAvailable".Translate(),
-                            MessageTypeDefOf.RejectInput);
-                        this.EndJobWith(JobCondition.Incompletable);
-                        return;
-                    }
-
-                    job.targetB = missingIngredient;
-                    job.count = Processor.GetAmountNeeded(missingIngredient);
-                },
-                defaultCompleteMode = ToilCompleteMode.Instant
-            };
-            yield return checkToil;
-
-            var gotoIngredient = Toils_Goto.GotoThing(TargetIndex.B, PathEndMode.ClosestTouch);
-            gotoIngredient.FailOnDestroyedOrNull(TargetIndex.B);
-            yield return gotoIngredient;
+            gotoToil.defaultCompleteMode = ToilCompleteMode.PatherArrival;
+            yield return gotoToil;
 
             var takeToil = new Toil
             {
@@ -293,16 +187,21 @@ namespace _3DPrinters
                     var ingredient = job.targetB.Thing;
                     if (ingredient == null || ingredient.Destroyed || !ingredient.Spawned)
                     {
-                        this.EndJobWith(JobCondition.Incompletable);
                         return;
                     }
 
-                    int toTake = Mathf.Min(job.count, ingredient.stackCount);
+                    int remainingNeeded = Processor?.GetRemainingIngredientCount(ingredient.def) ?? int.MaxValue;
+                    if (remainingNeeded <= 0)
+                    {
+                        return;
+                    }
+
+                    int toTake = Mathf.Min(job.count, ingredient.stackCount, remainingNeeded);
+                    if (toTake <= 0) return;
 
                     if (toTake >= ingredient.stackCount)
                     {
-                        int stackCount = ingredient.stackCount;
-                        pawn.carryTracker.TryStartCarry(ingredient, stackCount);
+                        pawn.carryTracker.TryStartCarry(ingredient, ingredient.stackCount);
                         if (ingredient.Spawned)
                         {
                             ingredient.DeSpawn();
@@ -332,26 +231,58 @@ namespace _3DPrinters
                     Thing carried = pawn.carryTracker.CarriedThing;
                     if (carried != null && !carried.Destroyed)
                     {
-                        Processor.AddIngredient(carried.def, carried.stackCount);
-                        carried.Destroy(DestroyMode.Vanish);
+                        int amountNeeded = Processor.GetRemainingIngredientCount(carried.def);
+                        if (amountNeeded <= 0)
+                        {
+                            pawn.carryTracker.TryDropCarriedThing(pawn.Position, ThingPlaceMode.Near, out _);
+                            return;
+                        }
+
+                        int count = carried.stackCount;
+                        int toLoad = Mathf.Min(count, amountNeeded);
+
+                        if (toLoad < count)
+                        {
+                            Thing split = carried.SplitOff(toLoad);
+                            Processor.AddIngredient(split.def, split.stackCount);
+                            split.Destroy();
+                            pawn.carryTracker.TryStartCarry(carried, carried.stackCount);
+                        }
+                        else
+                        {
+                            Processor.AddIngredient(carried.def, count);
+                            carried.Destroy(DestroyMode.Vanish);
+                        }
                     }
                 },
                 defaultCompleteMode = ToilCompleteMode.Instant
             };
             yield return loadToil;
+        }
+    }
 
-            var operateToil = new Toil
+    // JobDriver для запуска принтера
+    public class JobDriver_Operate3DPrinter : JobDriver
+    {
+        private CompAutoProcessor Processor => job.targetA.Thing?.TryGetComp<CompAutoProcessor>();
+
+        public override bool TryMakePreToilReservations(bool errorOnFailed)
+        {
+            return true;
+        }
+
+        protected override IEnumerable<Toil> MakeNewToils()
+        {
+            this.FailOnDespawnedOrNull(TargetIndex.A);
+            this.FailOnBurningImmobile(TargetIndex.A);
+            yield return Toils_Goto.GotoThing(TargetIndex.A, PathEndMode.Touch);
+
+            var workToil = new Toil
             {
-                initAction = () =>
-                {
-                    if (Processor != null && Processor.NeedsWorkNow(pawn))
-                    {
-                        Processor.StartWorking(pawn);
-                    }
-                },
+                initAction = () => Processor?.StartWorking(pawn),
                 defaultCompleteMode = ToilCompleteMode.Instant
             };
-            yield return operateToil;
+            yield return workToil;
         }
     }
 
@@ -373,7 +304,6 @@ namespace _3DPrinters
 
             bool canHaul = selPawn.workSettings != null && selPawn.workSettings.WorkIsActive(WorkTypeDefOf.Hauling);
 
-            // Пункт: загрузить ингредиенты
             if (comp.CurrentState == PrinterState.WaitingForIngredients && comp.SelectedRecipe != null && comp.NeedsHauling(selPawn))
             {
                 TaggedString haulTag = "_3DPrinters.HaulToPrinterFloat".Translate();
@@ -399,7 +329,6 @@ namespace _3DPrinters
                 }
             }
 
-            // Пункт: обслужить принтер
             if (comp.CurrentState == PrinterState.WaitingForIngredients && comp.SelectedRecipe != null)
             {
                 TaggedString forceTag = "_3DPrinters.ForceOperateFloat".Translate();
@@ -442,7 +371,6 @@ namespace _3DPrinters
                 }
             }
 
-            // Остановить
             if (comp.CurrentState == PrinterState.Processing || comp.CurrentState == PrinterState.WaitingForIngredients)
             {
                 TaggedString stopTag = "_3DPrinters.StopFloat".Translate();
@@ -450,7 +378,6 @@ namespace _3DPrinters
                 yield return new FloatMenuOption(stopLabel, () => comp.StopMachine());
             }
 
-            // Возобновить
             if (comp.CurrentState == PrinterState.Stopped)
             {
                 TaggedString resumeTag = "_3DPrinters.ResumeFloat".Translate();
@@ -558,7 +485,6 @@ namespace _3DPrinters
         {
             if (def == null || count <= 0) return;
 
-            // Если принтер остановлен — сбрасываем ресурс рядом
             if (state == PrinterState.Stopped)
             {
                 var map = parent.Map;
@@ -568,7 +494,7 @@ namespace _3DPrinters
                     if (droppedThing != null)
                     {
                         droppedThing.stackCount = count;
-                        GenPlace.TryPlaceThing(droppedThing, parent.Position, map, ThingPlaceMode.Near);
+                        GenSpawn.Spawn(droppedThing, parent.Position, map);
                     }
                 }
                 return;
@@ -589,6 +515,23 @@ namespace _3DPrinters
                     loadedIngredients.Add(tempThing);
                 }
             }
+        }
+
+        public int GetRemainingIngredientCount(ThingDef def)
+        {
+            if (selectedRecipe == null) return 0;
+
+            foreach (var ingredientDef in selectedRecipe.ingredients)
+            {
+                if (ingredientDef.filter.Allows(def))
+                {
+                    float required = ingredientDef.GetBaseCount();
+                    float loaded = loadedIngredients.Where(t => t != null && ingredientDef.filter.Allows(t.def)).Sum(t => (float)t.stackCount);
+                    float remaining = required - loaded;
+                    return Mathf.Max(0, Mathf.CeilToInt(remaining));
+                }
+            }
+            return 0;
         }
 
         public bool NeedsHauling(Pawn pawn)
@@ -613,7 +556,8 @@ namespace _3DPrinters
                 if (!ingredientDef.filter.Allows(ingredient.def)) continue;
                 float required = ingredientDef.GetBaseCount();
                 float loaded = loadedIngredients.Where(t => t != null && ingredientDef.filter.Allows(t.def)).Sum(t => (float)t.stackCount);
-                return Mathf.CeilToInt(required - loaded);
+                float remaining = required - loaded;
+                return Mathf.Max(0, Mathf.CeilToInt(remaining));
             }
             return 0;
         }
